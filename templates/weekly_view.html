@@ -28,7 +28,8 @@
                     {% for activity in activities %}
                     <div class="activity-item mb-2" data-activity-id="{{ activity.id }}">
                         <strong>{{ activity.start_time.strftime('%I:%M %p') }}</strong><br>
-                        {{ activity.title }}
+                        {{ activity.title }}<br>
+                        <small>{{ activity.category }} - ${{ '%0.2f'|format(activity.price) }}</small>
                     </div>
                     {% endfor %}
                 </div>

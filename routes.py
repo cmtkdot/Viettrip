@@ -24,7 +24,9 @@ def add_activity():
             end_time=end_time,
             title=request.form['title'],
             location=request.form['location'],
-            description=request.form['description']
+            description=request.form['description'],
+            category=request.form['category'],
+            price=float(request.form['price'])
         )
         db.session.add(new_activity)
         db.session.commit()
@@ -52,3 +54,24 @@ def weekly_view():
         week_activities[activity.date].append(activity)
     
     return render_template('weekly_view.html', week_activities=week_activities, start_of_week=start_of_week, timedelta=timedelta)
+
+@app.route('/bulk_add_activities', methods=['POST'])
+def bulk_add_activities():
+    activities_data = request.json['activities']
+    for activity_data in activities_data:
+        date = datetime.strptime(activity_data['date'], '%m/%d/%Y').date()
+        start_time = datetime.strptime(activity_data['start_time'], '%I:%M %p').time()
+        end_time = datetime.strptime(activity_data['end_time'], '%I:%M %p').time()
+        new_activity = Activity(
+            date=date,
+            start_time=start_time,
+            end_time=end_time,
+            title=activity_data['title'],
+            location=activity_data['location'],
+            description=activity_data['description'],
+            category=activity_data['category'],
+            price=float(activity_data['price'])
+        )
+        db.session.add(new_activity)
+    db.session.commit()
+    return jsonify({'message': 'Activities added successfully'}), 201

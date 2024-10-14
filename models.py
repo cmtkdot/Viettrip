@@ -9,6 +9,8 @@ class Activity(db.Model):
     title = db.Column(db.String(100), nullable=False)
     location = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=True)
+    category = db.Column(db.String(50), nullable=False)
+    price = db.Column(db.Float, nullable=False, default=0.0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
@@ -22,5 +24,7 @@ class Activity(db.Model):
             'end_time': self.end_time.isoformat(),
             'title': self.title,
             'location': self.location,
-            'description': self.description
+            'description': self.description,
+            'category': self.category,
+            'price': self.price
         }

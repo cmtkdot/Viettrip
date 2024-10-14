@@ -63,3 +63,14 @@ body {
 #weekRange {
     font-weight: bold;
 }
+
+/* New styles for category and price */
+.activity-item .category {
+    font-style: italic;
+    color: var(--bs-info);
+}
+
+.activity-item .price {
+    font-weight: bold;
+    color: var(--bs-success);
+}

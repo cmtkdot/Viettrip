@@ -55,14 +55,22 @@ document.addEventListener('DOMContentLoaded', function() {
     activityItems.forEach(item => {
         item.addEventListener('click', () => {
             const activityId = item.getAttribute('data-activity-id');
-            // Here you would typically fetch the activity details from the server
-            // For this example, we'll just display some placeholder text
-            activityModalBody.innerHTML = `
-                <h5>${item.querySelector('strong').textContent}</h5>
-                <p>${item.textContent}</p>
-                <p>Activity ID: ${activityId}</p>
-            `;
-            activityModal.show();
+            // Fetch activity details from the server
+            fetch(`/activities/${activityId}`)
+                .then(response => response.json())
+                .then(activity => {
+                    activityModalBody.innerHTML = `
+                        <h5>${activity.title}</h5>
+                        <p><strong>Date:</strong> ${moment(activity.date).format('MMMM D, YYYY')}</p>
+                        <p><strong>Time:</strong> ${moment(activity.start_time, 'HH:mm:ss').format('h:mm A')} - ${moment(activity.end_time, 'HH:mm:ss').format('h:mm A')}</p>
+                        <p><strong>Location:</strong> ${activity.location}</p>
+                        <p><strong>Category:</strong> ${activity.category}</p>
+                        <p><strong>Price:</strong> $${activity.price.toFixed(2)}</p>
+                        <p><strong>Description:</strong> ${activity.description}</p>
+                    `;
+                    activityModal.show();
+                })
+                .catch(error => console.error('Error fetching activity details:', error));
         });
     });
 });
