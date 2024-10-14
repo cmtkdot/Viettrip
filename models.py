@@ -4,7 +4,8 @@ from datetime import datetime
 class Activity(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, nullable=False)
-    time = db.Column(db.Time, nullable=False)
+    start_time = db.Column(db.Time, nullable=False)
+    end_time = db.Column(db.Time, nullable=False)
     title = db.Column(db.String(100), nullable=False)
     location = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=True)
@@ -17,7 +18,8 @@ class Activity(db.Model):
         return {
             'id': self.id,
             'date': self.date.isoformat(),
-            'time': self.time.isoformat(),
+            'start_time': self.start_time.isoformat(),
+            'end_time': self.end_time.isoformat(),
             'title': self.title,
             'location': self.location,
             'description': self.description

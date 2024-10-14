@@ -4,15 +4,23 @@
 <h1 class="mb-4">Vietnam Trip Itinerary</h1>
 
 <div id="itinerary">
-    {% for activity in activities %}
-    <div class="card mb-3">
+    {% for date, activities in grouped_activities.items() %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="h4 mb-0">{{ date.strftime('%B %d, %Y') }}</h2>
+        </div>
         <div class="card-body">
-            <h5 class="card-title">{{ activity.title }}</h5>
-            <h6 class="card-subtitle mb-2 text-muted">
-                {{ activity.date.strftime('%Y-%m-%d') }} at {{ activity.time.strftime('%H:%M') }}
-            </h6>
-            <p class="card-text"><strong>Location:</strong> {{ activity.location }}</p>
-            <p class="card-text">{{ activity.description }}</p>
+            {% for activity in activities %}
+            <div class="activity-item mb-3">
+                <h5 class="card-title">{{ activity.title }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">
+                    {{ activity.start_time.strftime('%I:%M %p') }} - {{ activity.end_time.strftime('%I:%M %p') }}
+                </h6>
+                <p class="card-text"><strong>Location:</strong> {{ activity.location }}</p>
+                <p class="card-text">{{ activity.description }}</p>
+            </div>
+            {% if not loop.last %}<hr>{% endif %}
+            {% endfor %}
         </div>
     </div>
     {% endfor %}

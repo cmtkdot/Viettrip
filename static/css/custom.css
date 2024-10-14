@@ -1,12 +1,38 @@
-/* Add any custom styles here if needed */
 body {
     padding-bottom: 2rem;
 }
 
 .card {
     transition: transform 0.2s;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .card:hover {
     transform: translateY(-5px);
+}
+
+.card-header {
+    background-color: var(--bs-primary);
+    color: var(--bs-light);
+}
+
+.activity-item {
+    padding: 1rem;
+    background-color: var(--bs-dark);
+    border-radius: 0.25rem;
+}
+
+.activity-item:hover {
+    background-color: var(--bs-secondary);
+}
+
+.btn-primary {
+    background-color: var(--bs-info);
+    border-color: var(--bs-info);
+}
+
+.btn-primary:hover {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
 }
