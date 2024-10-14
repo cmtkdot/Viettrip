@@ -15,6 +15,7 @@ def index():
 
 @app.route('/add_activity', methods=['GET', 'POST'])
 def add_activity():
+    categories = ['Travel', 'Accommodation', 'Sightseeing', 'Cultural', 'Food', 'Entertainment', 'Historical']
     if request.method == 'POST':
         date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
         start_time = datetime.strptime(request.form['start_time'], '%H:%M').time()
@@ -32,7 +33,7 @@ def add_activity():
         db.session.add(new_activity)
         db.session.commit()
         return redirect(url_for('index'))
-    return render_template('add_activity.html')
+    return render_template('add_activity.html', categories=categories)
 
 @app.route('/activities')
 def get_activities():
