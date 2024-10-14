@@ -3,6 +3,63 @@
 {% block content %}
 <h1 class="mb-4">Weekly View</h1>
 
+<form id="category-filter-form" class="mb-3">
+  <div class="row">
+    <div class="col">
+      <h5>Filter by Category:</h5>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-auto">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Travel" id="filter-travel" checked>
+        <label class="form-check-label" for="filter-travel">Travel</label>
+      </div>
+    </div>
+    <div class="col-auto">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Accommodation" id="filter-accommodation" checked>
+        <label class="form-check-label" for="filter-accommodation">Accommodation</label>
+      </div>
+    </div>
+    <div class="col-auto">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Sightseeing" id="filter-sightseeing" checked>
+        <label class="form-check-label" for="filter-sightseeing">Sightseeing</label>
+      </div>
+    </div>
+    <div class="col-auto">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Cultural" id="filter-cultural" checked>
+        <label class="form-check-label" for="filter-cultural">Cultural</label>
+      </div>
+    </div>
+    <div class="col-auto">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Food" id="filter-food" checked>
+        <label class="form-check-label" for="filter-food">Food</label>
+      </div>
+    </div>
+    <div class="col-auto">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Entertainment" id="filter-entertainment" checked>
+        <label class="form-check-label" for="filter-entertainment">Entertainment</label>
+      </div>
+    </div>
+    <div class="col-auto">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Historical" id="filter-historical" checked>
+        <label class="form-check-label" for="filter-historical">Historical</label>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-2">
+    <div class="col">
+      <button type="submit" class="btn btn-primary">Apply Filters</button>
+    </div>
+  </div>
+</form>
+
 <div class="weekly-view-container">
   <div class="weekly-calendar-container">
     <div class="row mb-3">

@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const prevWeekBtn = document.getElementById('prevWeek');
     const nextWeekBtn = document.getElementById('nextWeek');
     const weekRangeElement = document.getElementById('weekRange');
+    const categoryFilterForm = document.getElementById('category-filter-form');
+    let selectedCategories = [];
 
     if (prevWeekBtn && nextWeekBtn && weekRangeElement) {
         let currentWeekStart = moment(weekRangeElement.textContent.split(' - ')[0], 'MMMM D, YYYY');
@@ -12,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
             weekRangeElement.textContent = `${startDate.format('MMMM D, YYYY')} - ${endDate.format('MMMM D, YYYY')}`;
             
             // Fetch new data for the week and update the calendar
-            fetch(`/weekly_view_data?start_date=${startDate.format('YYYY-MM-DD')}`)
+            fetch(`/weekly_view_data?start_date=${startDate.format('YYYY-MM-DD')}&categories=${selectedCategories.join(',')}`)
                 .then(response => response.json())
                 .then(data => {
                     updateWeeklyCalendar(data);
@@ -40,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const relevantActivities = activities.filter(activity => {
                         const startHour = moment(activity.start_time, 'HH:mm:ss').hour();
                         const endHour = moment(activity.end_time, 'HH:mm:ss').hour();
-                        return startHour <= hour && endHour > hour;
+                        return startHour <= hour && endHour > hour && selectedCategories.includes(activity.category);
                     });
 
                     relevantActivities.forEach(activity => {
@@ -105,6 +107,16 @@ document.addEventListener('DOMContentLoaded', function() {
             currentWeekStart.add(7, 'days');
             updateWeekView(currentWeekStart);
         });
+
+        // Handle category filter form submission
+        categoryFilterForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            selectedCategories = Array.from(document.querySelectorAll('#category-filter-form input[type="checkbox"]:checked')).map(checkbox => checkbox.value);
+            updateWeekView(currentWeekStart);
+        });
+
+        // Initialize selected categories
+        selectedCategories = Array.from(document.querySelectorAll('#category-filter-form input[type="checkbox"]:checked')).map(checkbox => checkbox.value);
     }
 
     // Activity details modal

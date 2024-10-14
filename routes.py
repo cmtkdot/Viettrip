@@ -59,6 +59,8 @@ def weekly_view():
 @app.route('/weekly_view_data')
 def weekly_view_data():
     start_date = request.args.get('start_date')
+    categories = request.args.get('categories', '').split(',')
+    
     if start_date:
         start_of_week = datetime.strptime(start_date, '%Y-%m-%d').date()
     else:
@@ -66,10 +68,15 @@ def weekly_view_data():
     
     end_of_week = start_of_week + timedelta(days=6)
     
-    activities = Activity.query.filter(
+    activities_query = Activity.query.filter(
         Activity.date >= start_of_week,
         Activity.date <= end_of_week
-    ).order_by(Activity.date, Activity.start_time).all()
+    )
+    
+    if categories and categories[0]:  # Check if categories list is not empty
+        activities_query = activities_query.filter(Activity.category.in_(categories))
+    
+    activities = activities_query.order_by(Activity.date, Activity.start_time).all()
     
     week_activities = {(start_of_week + timedelta(days=i)).isoformat(): [] for i in range(7)}
     for activity in activities:

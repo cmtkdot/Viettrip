@@ -152,3 +152,29 @@ body {
 .activity-item[data-category="Food"] { background-color: var(--bs-primary); }
 .activity-item[data-category="Entertainment"] { background-color: var(--bs-secondary); }
 .activity-item[data-category="Historical"] { background-color: var(--bs-info-text); }
+
+/* Category filter form styles */
+#category-filter-form {
+    background-color: var(--bs-dark);
+    padding: 1rem;
+    border-radius: 0.25rem;
+    margin-bottom: 1rem;
+}
+
+#category-filter-form h5 {
+    color: var(--bs-light);
+}
+
+#category-filter-form .form-check-label {
+    color: var(--bs-light);
+}
+
+#category-filter-form .btn-primary {
+    background-color: var(--bs-info);
+    border-color: var(--bs-info);
+}
+
+#category-filter-form .btn-primary:hover {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
