@@ -40,11 +40,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     return moment(a.start_time, 'HH:mm:ss').diff(moment(b.start_time, 'HH:mm:ss'));
                 });
 
-                let lastEndTime = null;
+                const activityLanes = [];
+
                 sortedActivities.forEach((activity, index) => {
                     const activityItem = document.createElement('div');
                     activityItem.className = 'activity-item';
                     activityItem.dataset.activityId = activity.id;
+                    activityItem.dataset.category = activity.category;
 
                     const startTime = moment(activity.start_time, 'HH:mm:ss');
                     const endTime = moment(activity.end_time, 'HH:mm:ss');
@@ -58,12 +60,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     activityItem.style.height = `${height}%`;
 
                     // Handle overlapping activities
-                    if (lastEndTime && startTime.isBefore(lastEndTime)) {
-                        const overlap = moment.duration(lastEndTime.diff(startTime)).asMinutes();
-                        const overlapPercentage = overlap / durationInMinutes * 100;
-                        activityItem.style.marginTop = `${overlapPercentage}%`;
-                        activityItem.style.height = `${height - overlapPercentage}%`;
-                    }
+                    const lane = findAvailableLane(activityLanes, startTime, endTime);
+                    const laneWidth = 95 / (lane + 1);
+                    activityItem.style.width = `${laneWidth}%`;
+                    activityItem.style.left = `${lane * laneWidth}%`;
 
                     activityItem.innerHTML = `
                         <div class="activity-content">
@@ -77,8 +77,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     `;
                     dayActivities.appendChild(activityItem);
-
-                    lastEndTime = endTime;
                 });
 
                 daysContainer.appendChild(dayColumn);
@@ -87,6 +85,17 @@ document.addEventListener('DOMContentLoaded', function() {
             // Reattach event listeners for activity items and toggle buttons
             attachActivityItemListeners();
             attachToggleDayViewListeners();
+        }
+
+        function findAvailableLane(lanes, start, end) {
+            for (let i = 0; i < lanes.length; i++) {
+                if (lanes[i].every(slot => slot.end <= start || slot.start >= end)) {
+                    lanes[i].push({ start, end });
+                    return i;
+                }
+            }
+            lanes.push([{ start, end }]);
+            return lanes.length - 1;
         }
 
         prevWeekBtn.addEventListener('click', () => {
