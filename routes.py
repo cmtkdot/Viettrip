@@ -1,7 +1,7 @@
 from flask import render_template, request, jsonify, redirect, url_for
 from app import app, db
 from models import Activity
-from datetime import datetime
+from datetime import datetime, timedelta
 from itertools import groupby
 
 @app.route('/')
@@ -35,3 +35,20 @@ def add_activity():
 def get_activities():
     activities = Activity.query.order_by(Activity.date, Activity.start_time).all()
     return jsonify([activity.to_dict() for activity in activities])
+
+@app.route('/weekly_view')
+def weekly_view():
+    today = datetime.now().date()
+    start_of_week = today - timedelta(days=today.weekday())
+    end_of_week = start_of_week + timedelta(days=6)
+    
+    activities = Activity.query.filter(
+        Activity.date >= start_of_week,
+        Activity.date <= end_of_week
+    ).order_by(Activity.date, Activity.start_time).all()
+    
+    week_activities = {(start_of_week + timedelta(days=i)): [] for i in range(7)}
+    for activity in activities:
+        week_activities[activity.date].append(activity)
+    
+    return render_template('weekly_view.html', week_activities=week_activities, start_of_week=start_of_week, timedelta=timedelta)

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">Weekly View</h1>
+
+<div class="row mb-3">
+    <div class="col">
+        <button id="prevWeek" class="btn btn-secondary">&lt; Previous Week</button>
+    </div>
+    <div class="col text-center">
+        <h2 id="weekRange" class="h4">{{ start_of_week.strftime('%B %d, %Y') }} - {{ (start_of_week + timedelta(days=6)).strftime('%B %d, %Y') }}</h2>
+    </div>
+    <div class="col text-end">
+        <button id="nextWeek" class="btn btn-secondary">Next Week &gt;</button>
+    </div>
+</div>
+
+<div class="weekly-calendar">
+    <div class="row">
+        {% for day, activities in week_activities.items() %}
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    {{ day.strftime('%A') }}<br>
+                    {{ day.strftime('%B %d') }}
+                </div>
+                <div class="card-body">
+                    {% for activity in activities %}
+                    <div class="activity-item mb-2" data-activity-id="{{ activity.id }}">
+                        <strong>{{ activity.start_time.strftime('%I:%M %p') }}</strong><br>
+                        {{ activity.title }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="modal fade" id="activityModal" tabindex="-1" aria-labelledby="activityModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="activityModalLabel">Activity Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="activityModalBody">
+                <!-- Activity details will be populated here -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

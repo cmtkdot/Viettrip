@@ -3,6 +3,10 @@
 {% block content %}
 <h1 class="mb-4">Vietnam Trip Itinerary</h1>
 
+<div class="mb-4">
+    <a href="{{ url_for('weekly_view') }}" class="btn btn-primary">View Weekly Calendar</a>
+</div>
+
 <div id="itinerary">
     {% for date, activities in grouped_activities.items() %}
     <div class="card mb-4">
