@@ -1,20 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Format dates and times
-    const dateHeaders = document.querySelectorAll('.card-header h2');
-    dateHeaders.forEach(element => {
-        const date = moment(element.textContent, 'MMMM DD, YYYY');
-        element.textContent = date.format('dddd, MMMM D, YYYY');
-    });
-
-    const timeRanges = document.querySelectorAll('.card-subtitle');
-    timeRanges.forEach(element => {
-        const timeRange = element.textContent.trim();
-        const [startTime, endTime] = timeRange.split(' - ');
-        const formattedStartTime = moment(startTime, 'hh:mm A').format('h:mm A');
-        const formattedEndTime = moment(endTime, 'hh:mm A').format('h:mm A');
-        element.textContent = `${formattedStartTime} - ${formattedEndTime}`;
-    });
-
     // Weekly view functionality
     const prevWeekBtn = document.getElementById('prevWeek');
     const nextWeekBtn = document.getElementById('nextWeek');
@@ -27,13 +11,47 @@ document.addEventListener('DOMContentLoaded', function() {
             const endDate = moment(startDate).add(6, 'days');
             weekRangeElement.textContent = `${startDate.format('MMMM D, YYYY')} - ${endDate.format('MMMM D, YYYY')}`;
             
-            // Here you would typically fetch new data for the week and update the calendar
-            // For this example, we'll just update the dates in the existing cards
-            const dayCards = document.querySelectorAll('.weekly-calendar .card-header');
-            dayCards.forEach((card, index) => {
-                const day = moment(startDate).add(index, 'days');
-                card.innerHTML = `${day.format('dddd')}<br>${day.format('MMMM D')}`;
+            // Fetch new data for the week and update the calendar
+            fetch(`/weekly_view_data?start_date=${startDate.format('YYYY-MM-DD')}`)
+                .then(response => response.json())
+                .then(data => {
+                    updateWeeklyCalendar(data);
+                })
+                .catch(error => console.error('Error fetching weekly view data:', error));
+        }
+
+        function updateWeeklyCalendar(data) {
+            const daysContainer = document.querySelector('.days-container');
+            daysContainer.innerHTML = '';
+
+            Object.entries(data).forEach(([day, activities]) => {
+                const dayColumn = document.createElement('div');
+                dayColumn.className = 'day-column';
+                dayColumn.innerHTML = `
+                    <div class="day-header">${moment(day).format('dddd')}<br>${moment(day).format('MMMM D')}</div>
+                    <div class="day-activities"></div>
+                `;
+
+                const dayActivities = dayColumn.querySelector('.day-activities');
+                activities.forEach(activity => {
+                    const activityItem = document.createElement('div');
+                    activityItem.className = 'activity-item';
+                    activityItem.dataset.activityId = activity.id;
+                    activityItem.style.top = `${((activity.start_time.hour * 60 + activity.start_time.minute) / 1440) * 100}%`;
+                    activityItem.style.height = `${((activity.end_time.hour * 60 + activity.end_time.minute) - (activity.start_time.hour * 60 + activity.start_time.minute)) / 1440 * 100}%`;
+                    activityItem.innerHTML = `
+                        <strong>${activity.title}</strong><br>
+                        ${moment(activity.start_time, 'HH:mm:ss').format('h:mm A')} - ${moment(activity.end_time, 'HH:mm:ss').format('h:mm A')}<br>
+                        <small>${activity.category} - $${parseFloat(activity.price).toFixed(2)}</small>
+                    `;
+                    dayActivities.appendChild(activityItem);
+                });
+
+                daysContainer.appendChild(dayColumn);
             });
+
+            // Reattach event listeners for activity items
+            attachActivityItemListeners();
         }
 
         prevWeekBtn.addEventListener('click', () => {
@@ -48,29 +66,34 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Activity details modal
-    const activityItems = document.querySelectorAll('.activity-item');
     const activityModal = new bootstrap.Modal(document.getElementById('activityModal'));
     const activityModalBody = document.getElementById('activityModalBody');
 
-    activityItems.forEach(item => {
-        item.addEventListener('click', () => {
-            const activityId = item.getAttribute('data-activity-id');
-            // Fetch activity details from the server
-            fetch(`/activities/${activityId}`)
-                .then(response => response.json())
-                .then(activity => {
-                    activityModalBody.innerHTML = `
-                        <h5>${activity.title}</h5>
-                        <p><strong>Date:</strong> ${moment(activity.date).format('MMMM D, YYYY')}</p>
-                        <p><strong>Time:</strong> ${moment(activity.start_time, 'HH:mm:ss').format('h:mm A')} - ${moment(activity.end_time, 'HH:mm:ss').format('h:mm A')}</p>
-                        <p><strong>Location:</strong> ${activity.location}</p>
-                        <p><strong>Category:</strong> ${activity.category}</p>
-                        <p><strong>Price:</strong> $${activity.price.toFixed(2)}</p>
-                        <p><strong>Description:</strong> ${activity.description}</p>
-                    `;
-                    activityModal.show();
-                })
-                .catch(error => console.error('Error fetching activity details:', error));
+    function attachActivityItemListeners() {
+        const activityItems = document.querySelectorAll('.activity-item');
+        activityItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const activityId = item.getAttribute('data-activity-id');
+                // Fetch activity details from the server
+                fetch(`/activities/${activityId}`)
+                    .then(response => response.json())
+                    .then(activity => {
+                        activityModalBody.innerHTML = `
+                            <h5>${activity.title}</h5>
+                            <p><strong>Date:</strong> ${moment(activity.date).format('MMMM D, YYYY')}</p>
+                            <p><strong>Time:</strong> ${moment(activity.start_time, 'HH:mm:ss').format('h:mm A')} - ${moment(activity.end_time, 'HH:mm:ss').format('h:mm A')}</p>
+                            <p><strong>Location:</strong> ${activity.location}</p>
+                            <p><strong>Category:</strong> ${activity.category}</p>
+                            <p><strong>Price:</strong> $${parseFloat(activity.price).toFixed(2)}</p>
+                            <p><strong>Description:</strong> ${activity.description}</p>
+                        `;
+                        activityModal.show();
+                    })
+                    .catch(error => console.error('Error fetching activity details:', error));
+            });
         });
-    });
+    }
+
+    // Initial attachment of activity item listeners
+    attachActivityItemListeners();
 });

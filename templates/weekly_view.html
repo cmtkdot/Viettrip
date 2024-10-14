@@ -16,23 +16,23 @@
 </div>
 
 <div class="weekly-calendar">
-    <div class="row">
+    <div class="timeline">
+        {% for hour in range(0, 24) %}
+            <div class="time-marker">{{ '{:02d}:00'.format(hour) }}</div>
+        {% endfor %}
+    </div>
+    <div class="days-container">
         {% for day, activities in week_activities.items() %}
-        <div class="col">
-            <div class="card">
-                <div class="card-header">
-                    {{ day.strftime('%A') }}<br>
-                    {{ day.strftime('%B %d') }}
+        <div class="day-column">
+            <div class="day-header">{{ day.strftime('%A') }}<br>{{ day.strftime('%B %d') }}</div>
+            <div class="day-activities">
+                {% for activity in activities %}
+                <div class="activity-item" data-activity-id="{{ activity.id }}" style="top: {{ ((activity.start_time.hour * 60 + activity.start_time.minute) / 1440) * 100 }}%; height: {{ ((activity.end_time.hour * 60 + activity.end_time.minute) - (activity.start_time.hour * 60 + activity.start_time.minute)) / 1440 * 100 }}%;">
+                    <strong>{{ activity.title }}</strong><br>
+                    {{ activity.start_time.strftime('%I:%M %p') }} - {{ activity.end_time.strftime('%I:%M %p') }}<br>
+                    <small>{{ activity.category }} - ${{ '%0.2f'|format(activity.price) }}</small>
                 </div>
-                <div class="card-body">
-                    {% for activity in activities %}
-                    <div class="activity-item mb-2" data-activity-id="{{ activity.id }}">
-                        <strong>{{ activity.start_time.strftime('%I:%M %p') }}</strong><br>
-                        {{ activity.title }}<br>
-                        <small>{{ activity.category }} - ${{ '%0.2f'|format(activity.price) }}</small>
-                    </div>
-                    {% endfor %}
-                </div>
+                {% endfor %}
             </div>
         </div>
         {% endfor %}

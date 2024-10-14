@@ -2,13 +2,13 @@ from flask import render_template, request, jsonify, redirect, url_for
 from app import app, db
 from models import Activity
 from datetime import datetime, timedelta
-from itertools import groupby
+from sqlalchemy import func
 
 @app.route('/')
 def index():
     activities = Activity.query.order_by(Activity.date, Activity.start_time).all()
     grouped_activities = {}
-    for date, group in groupby(activities, key=lambda x: x.date):
+    for date, group in itertools.groupby(activities, key=lambda x: x.date):
         grouped_activities[date] = list(group)
     return render_template('index.html', grouped_activities=grouped_activities)
 
@@ -55,6 +55,27 @@ def weekly_view():
     
     return render_template('weekly_view.html', week_activities=week_activities, start_of_week=start_of_week, timedelta=timedelta)
 
+@app.route('/weekly_view_data')
+def weekly_view_data():
+    start_date = request.args.get('start_date')
+    if start_date:
+        start_of_week = datetime.strptime(start_date, '%Y-%m-%d').date()
+    else:
+        start_of_week = datetime.now().date() - timedelta(days=datetime.now().weekday())
+    
+    end_of_week = start_of_week + timedelta(days=6)
+    
+    activities = Activity.query.filter(
+        Activity.date >= start_of_week,
+        Activity.date <= end_of_week
+    ).order_by(Activity.date, Activity.start_time).all()
+    
+    week_activities = {(start_of_week + timedelta(days=i)).isoformat(): [] for i in range(7)}
+    for activity in activities:
+        week_activities[activity.date.isoformat()].append(activity.to_dict())
+    
+    return jsonify(week_activities)
+
 @app.route('/bulk_add_activities', methods=['POST'])
 def bulk_add_activities():
     activities_data = request.json['activities']
@@ -75,3 +96,8 @@ def bulk_add_activities():
         db.session.add(new_activity)
     db.session.commit()
     return jsonify({'message': 'Activities added successfully'}), 201
+
+@app.route('/activities/<int:activity_id>')
+def get_activity(activity_id):
+    activity = Activity.query.get_or_404(activity_id)
+    return jsonify(activity.to_dict())
