@@ -1,0 +1,12 @@
+/* Add any custom styles here if needed */
+body {
+    padding-bottom: 2rem;
+}
+
+.card {
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}

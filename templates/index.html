@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">Vietnam Trip Itinerary</h1>
+
+<div id="itinerary">
+    {% for activity in activities %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">{{ activity.title }}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">
+                {{ activity.date.strftime('%Y-%m-%d') }} at {{ activity.time.strftime('%H:%M') }}
+            </h6>
+            <p class="card-text"><strong>Location:</strong> {{ activity.location }}</p>
+            <p class="card-text">{{ activity.description }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<a href="{{ url_for('add_activity') }}" class="btn btn-primary">Add New Activity</a>
+{% endblock %}
