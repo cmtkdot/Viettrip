@@ -28,30 +28,65 @@ document.addEventListener('DOMContentLoaded', function() {
                 const dayColumn = document.createElement('div');
                 dayColumn.className = 'day-column';
                 dayColumn.innerHTML = `
-                    <div class="day-header">${moment(day).format('dddd')}<br>${moment(day).format('MMMM D')}</div>
+                    <div class="day-header">
+                        ${moment(day).format('ddd DD')}
+                        <button class="btn btn-sm btn-outline-secondary toggle-day-view">Toggle</button>
+                    </div>
                     <div class="day-activities"></div>
                 `;
 
                 const dayActivities = dayColumn.querySelector('.day-activities');
-                activities.forEach(activity => {
+                const sortedActivities = activities.sort((a, b) => {
+                    return moment(a.start_time, 'HH:mm:ss').diff(moment(b.start_time, 'HH:mm:ss'));
+                });
+
+                let lastEndTime = null;
+                sortedActivities.forEach((activity, index) => {
                     const activityItem = document.createElement('div');
                     activityItem.className = 'activity-item';
                     activityItem.dataset.activityId = activity.id;
-                    activityItem.style.top = `${((activity.start_time.hour * 60 + activity.start_time.minute) / 1440) * 100}%`;
-                    activityItem.style.height = `${((activity.end_time.hour * 60 + activity.end_time.minute) - (activity.start_time.hour * 60 + activity.start_time.minute)) / 1440 * 100}%`;
+
+                    const startTime = moment(activity.start_time, 'HH:mm:ss');
+                    const endTime = moment(activity.end_time, 'HH:mm:ss');
+                    const duration = moment.duration(endTime.diff(startTime));
+                    const durationInMinutes = duration.asMinutes();
+
+                    const top = (startTime.hour() * 60 + startTime.minute()) / 1440 * 100;
+                    const height = durationInMinutes / 1440 * 100;
+
+                    activityItem.style.top = `${top}%`;
+                    activityItem.style.height = `${height}%`;
+
+                    // Handle overlapping activities
+                    if (lastEndTime && startTime.isBefore(lastEndTime)) {
+                        const overlap = moment.duration(lastEndTime.diff(startTime)).asMinutes();
+                        const overlapPercentage = overlap / durationInMinutes * 100;
+                        activityItem.style.marginTop = `${overlapPercentage}%`;
+                        activityItem.style.height = `${height - overlapPercentage}%`;
+                    }
+
                     activityItem.innerHTML = `
-                        <strong>${activity.title}</strong><br>
-                        ${moment(activity.start_time, 'HH:mm:ss').format('h:mm A')} - ${moment(activity.end_time, 'HH:mm:ss').format('h:mm A')}<br>
-                        <small>${activity.category} - $${parseFloat(activity.price).toFixed(2)}</small>
+                        <div class="activity-content">
+                            <strong>${activity.title}</strong><br>
+                            <small>${startTime.format('h:mm A')} - ${endTime.format('h:mm A')}</small>
+                        </div>
+                        <div class="activity-details">
+                            <p><strong>Location:</strong> ${activity.location}</p>
+                            <p><strong>Category:</strong> ${activity.category}</p>
+                            <p><strong>Price:</strong> $${parseFloat(activity.price).toFixed(2)}</p>
+                        </div>
                     `;
                     dayActivities.appendChild(activityItem);
+
+                    lastEndTime = endTime;
                 });
 
                 daysContainer.appendChild(dayColumn);
             });
 
-            // Reattach event listeners for activity items
+            // Reattach event listeners for activity items and toggle buttons
             attachActivityItemListeners();
+            attachToggleDayViewListeners();
         }
 
         prevWeekBtn.addEventListener('click', () => {
@@ -94,6 +129,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Initial attachment of activity item listeners
+    function attachToggleDayViewListeners() {
+        const toggleButtons = document.querySelectorAll('.toggle-day-view');
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const dayColumn = event.target.closest('.day-column');
+                dayColumn.classList.toggle('collapsed');
+                event.stopPropagation();
+            });
+        });
+    }
+
+    // Initial attachment of activity item listeners and toggle day view listeners
     attachActivityItemListeners();
+    attachToggleDayViewListeners();
 });

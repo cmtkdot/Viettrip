@@ -3,6 +3,7 @@ from app import app, db
 from models import Activity
 from datetime import datetime, timedelta
 from sqlalchemy import func
+import itertools
 
 @app.route('/')
 def index():
@@ -72,13 +73,17 @@ def weekly_view_data():
     
     week_activities = {(start_of_week + timedelta(days=i)).isoformat(): [] for i in range(7)}
     for activity in activities:
-        week_activities[activity.date.isoformat()].append(activity.to_dict())
+        activity_dict = activity.to_dict()
+        activity_dict['start_minutes'] = activity.start_time.hour * 60 + activity.start_time.minute
+        activity_dict['end_minutes'] = activity.end_time.hour * 60 + activity.end_time.minute
+        activity_dict['duration_minutes'] = activity_dict['end_minutes'] - activity_dict['start_minutes']
+        week_activities[activity.date.isoformat()].append(activity_dict)
     
     return jsonify(week_activities)
 
 @app.route('/bulk_add_activities', methods=['POST'])
 def bulk_add_activities():
-    activities_data = request.json['activities']
+    activities_data = request.json.get('activities', [])
     for activity_data in activities_data:
         date = datetime.strptime(activity_data['date'], '%m/%d/%Y').date()
         start_time = datetime.strptime(activity_data['start_time'], '%I:%M %p').time()

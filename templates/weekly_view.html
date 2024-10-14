@@ -24,13 +24,22 @@
     <div class="days-container">
         {% for day, activities in week_activities.items() %}
         <div class="day-column">
-            <div class="day-header">{{ day.strftime('%A') }}<br>{{ day.strftime('%B %d') }}</div>
+            <div class="day-header">
+                {{ day.strftime('%a %d') }}
+                <button class="btn btn-sm btn-outline-secondary toggle-day-view">Toggle</button>
+            </div>
             <div class="day-activities">
                 {% for activity in activities %}
                 <div class="activity-item" data-activity-id="{{ activity.id }}" style="top: {{ ((activity.start_time.hour * 60 + activity.start_time.minute) / 1440) * 100 }}%; height: {{ ((activity.end_time.hour * 60 + activity.end_time.minute) - (activity.start_time.hour * 60 + activity.start_time.minute)) / 1440 * 100 }}%;">
-                    <strong>{{ activity.title }}</strong><br>
-                    {{ activity.start_time.strftime('%I:%M %p') }} - {{ activity.end_time.strftime('%I:%M %p') }}<br>
-                    <small>{{ activity.category }} - ${{ '%0.2f'|format(activity.price) }}</small>
+                    <div class="activity-content">
+                        <strong>{{ activity.title }}</strong><br>
+                        <small>{{ activity.start_time.strftime('%I:%M %p') }} - {{ activity.end_time.strftime('%I:%M %p') }}</small>
+                    </div>
+                    <div class="activity-details">
+                        <p><strong>Location:</strong> {{ activity.location }}</p>
+                        <p><strong>Category:</strong> {{ activity.category }}</p>
+                        <p><strong>Price:</strong> ${{ '%0.2f'|format(activity.price) }}</p>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
