@@ -21,81 +21,79 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         function updateWeeklyCalendar(data) {
-            const daysContainer = document.querySelector('.days-container');
-            daysContainer.innerHTML = '';
+            const timeRows = document.querySelector('.time-rows');
+            timeRows.innerHTML = '';
 
-            Object.entries(data).forEach(([day, activities]) => {
-                const dayColumn = document.createElement('div');
-                dayColumn.className = 'day-column';
-                dayColumn.innerHTML = `
-                    <div class="day-header">
-                        ${moment(day).format('ddd DD')}
-                        <button class="btn btn-sm btn-outline-secondary toggle-day-view">Toggle</button>
-                    </div>
-                    <div class="day-activities"></div>
+            for (let hour = 0; hour < 24; hour++) {
+                const timeRow = document.createElement('div');
+                timeRow.className = 'time-row';
+                timeRow.innerHTML = `
+                    <div class="time-label">${hour.toString().padStart(2, '0')}:00</div>
                 `;
 
-                const dayActivities = dayColumn.querySelector('.day-activities');
-                const sortedActivities = activities.sort((a, b) => {
-                    return moment(a.start_time, 'HH:mm:ss').diff(moment(b.start_time, 'HH:mm:ss'));
+                Object.entries(data).forEach(([day, activities]) => {
+                    const dayCell = document.createElement('div');
+                    dayCell.className = 'day-cell';
+                    dayCell.dataset.day = day;
+                    dayCell.dataset.hour = hour;
+
+                    const relevantActivities = activities.filter(activity => {
+                        const startHour = moment(activity.start_time, 'HH:mm:ss').hour();
+                        const endHour = moment(activity.end_time, 'HH:mm:ss').hour();
+                        return startHour <= hour && endHour > hour;
+                    });
+
+                    relevantActivities.forEach(activity => {
+                        const activityItem = createActivityItem(activity, hour);
+                        dayCell.appendChild(activityItem);
+                    });
+
+                    timeRow.appendChild(dayCell);
                 });
 
-                const activityLanes = [];
-
-                sortedActivities.forEach((activity, index) => {
-                    const activityItem = document.createElement('div');
-                    activityItem.className = 'activity-item';
-                    activityItem.dataset.activityId = activity.id;
-                    activityItem.dataset.category = activity.category;
-
-                    const startTime = moment(activity.start_time, 'HH:mm:ss');
-                    const endTime = moment(activity.end_time, 'HH:mm:ss');
-                    const duration = moment.duration(endTime.diff(startTime));
-                    const durationInMinutes = duration.asMinutes();
-
-                    const top = (startTime.hour() * 60 + startTime.minute()) / 1440 * 100;
-                    const height = durationInMinutes / 1440 * 100;
-
-                    activityItem.style.top = `${top}%`;
-                    activityItem.style.height = `${height}%`;
-
-                    // Handle overlapping activities
-                    const lane = findAvailableLane(activityLanes, startTime, endTime);
-                    const laneWidth = 95 / (lane + 1);
-                    activityItem.style.width = `${laneWidth}%`;
-                    activityItem.style.left = `${lane * laneWidth}%`;
-
-                    activityItem.innerHTML = `
-                        <div class="activity-content">
-                            <strong>${activity.title}</strong><br>
-                            <small>${startTime.format('h:mm A')} - ${endTime.format('h:mm A')}</small>
-                        </div>
-                        <div class="activity-details">
-                            <p><strong>Location:</strong> ${activity.location}</p>
-                            <p><strong>Category:</strong> ${activity.category}</p>
-                            <p><strong>Price:</strong> $${parseFloat(activity.price).toFixed(2)}</p>
-                        </div>
-                    `;
-                    dayActivities.appendChild(activityItem);
-                });
-
-                daysContainer.appendChild(dayColumn);
-            });
+                timeRows.appendChild(timeRow);
+            }
 
             // Reattach event listeners for activity items and toggle buttons
             attachActivityItemListeners();
             attachToggleDayViewListeners();
         }
 
-        function findAvailableLane(lanes, start, end) {
-            for (let i = 0; i < lanes.length; i++) {
-                if (lanes[i].every(slot => slot.end <= start || slot.start >= end)) {
-                    lanes[i].push({ start, end });
-                    return i;
-                }
+        function createActivityItem(activity, currentHour) {
+            const activityItem = document.createElement('div');
+            activityItem.className = 'activity-item';
+            activityItem.dataset.activityId = activity.id;
+            activityItem.dataset.category = activity.category;
+
+            const startTime = moment(activity.start_time, 'HH:mm:ss');
+            const endTime = moment(activity.end_time, 'HH:mm:ss');
+            const startHour = startTime.hour();
+            const endHour = endTime.hour();
+
+            if (startHour === currentHour) {
+                const topOffset = (startTime.minute() / 60) * 100;
+                activityItem.style.top = `${topOffset}%`;
+            } else {
+                activityItem.style.top = '0%';
             }
-            lanes.push([{ start, end }]);
-            return lanes.length - 1;
+
+            const durationInHours = moment.duration(endTime.diff(startTime)).asHours();
+            const height = Math.min(durationInHours, endHour - currentHour) * 100;
+            activityItem.style.height = `${height}%`;
+
+            activityItem.innerHTML = `
+                <div class="activity-content">
+                    <strong>${activity.title}</strong><br>
+                    <small>${startTime.format('h:mm A')} - ${endTime.format('h:mm A')}</small>
+                </div>
+                <div class="activity-details">
+                    <p><strong>Location:</strong> ${activity.location}</p>
+                    <p><strong>Category:</strong> ${activity.category}</p>
+                    <p><strong>Price:</strong> $${parseFloat(activity.price).toFixed(2)}</p>
+                </div>
+            `;
+
+            return activityItem;
         }
 
         prevWeekBtn.addEventListener('click', () => {
@@ -142,8 +140,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const toggleButtons = document.querySelectorAll('.toggle-day-view');
         toggleButtons.forEach(button => {
             button.addEventListener('click', (event) => {
-                const dayColumn = event.target.closest('.day-column');
-                dayColumn.classList.toggle('collapsed');
+                const dayColumn = event.target.closest('.day-header');
+                const dayIndex = Array.from(dayColumn.parentNode.children).indexOf(dayColumn);
+                const dayCells = document.querySelectorAll(`.day-cell:nth-child(${dayIndex + 1})`);
+                dayCells.forEach(cell => cell.classList.toggle('collapsed'));
                 event.stopPropagation();
             });
         });
