@@ -45,6 +45,26 @@ body {
 }
 
 /* Weekly calendar styles */
+.weekly-view-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.weekly-calendar-container {
+    width: 80%;
+}
+
+.add-activity-container {
+    width: 18%;
+    padding-left: 2%;
+}
+
+.add-activity-container .btn {
+    width: 100%;
+    white-space: normal;
+}
+
 .weekly-calendar {
     display: flex;
     flex-direction: column;

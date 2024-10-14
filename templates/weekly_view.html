@@ -3,54 +3,61 @@
 {% block content %}
 <h1 class="mb-4">Weekly View</h1>
 
-<div class="row mb-3">
-    <div class="col">
-        <button id="prevWeek" class="btn btn-secondary">&lt; Previous Week</button>
+<div class="weekly-view-container">
+  <div class="weekly-calendar-container">
+    <div class="row mb-3">
+        <div class="col">
+            <button id="prevWeek" class="btn btn-secondary">&lt; Previous Week</button>
+        </div>
+        <div class="col text-center">
+            <h2 id="weekRange" class="h4">{{ start_of_week.strftime('%B %d, %Y') }} - {{ (start_of_week + timedelta(days=6)).strftime('%B %d, %Y') }}</h2>
+        </div>
+        <div class="col text-end">
+            <button id="nextWeek" class="btn btn-secondary">Next Week &gt;</button>
+        </div>
     </div>
-    <div class="col text-center">
-        <h2 id="weekRange" class="h4">{{ start_of_week.strftime('%B %d, %Y') }} - {{ (start_of_week + timedelta(days=6)).strftime('%B %d, %Y') }}</h2>
-    </div>
-    <div class="col text-end">
-        <button id="nextWeek" class="btn btn-secondary">Next Week &gt;</button>
-    </div>
-</div>
 
-<div class="weekly-calendar">
-    <div class="days-header">
-        <div class="time-label-header"></div>
-        {% for day in week_activities.keys() %}
-            <div class="day-header">
-                {{ day.strftime('%a %d') }}
-                <button class="btn btn-sm btn-outline-secondary toggle-day-view">Toggle</button>
-            </div>
-        {% endfor %}
-    </div>
-    <div class="time-rows">
-        {% for hour in range(0, 24) %}
-            <div class="time-row">
-                <div class="time-label">{{ '{:02d}:00'.format(hour) }}</div>
-                {% for day, activities in week_activities.items() %}
-                    <div class="day-cell" data-day="{{ day.strftime('%Y-%m-%d') }}" data-hour="{{ hour }}">
-                        {% for activity in activities %}
-                            {% if activity.start_time.hour == hour %}
-                                <div class="activity-item" data-activity-id="{{ activity.id }}" data-category="{{ activity.category }}" style="height: {{ ((activity.end_time.hour * 60 + activity.end_time.minute) - (activity.start_time.hour * 60 + activity.start_time.minute)) / 60 * 100 }}%;">
-                                    <div class="activity-content">
-                                        <strong>{{ activity.title }}</strong><br>
-                                        <small>{{ activity.start_time.strftime('%I:%M %p') }} - {{ activity.end_time.strftime('%I:%M %p') }}</small>
+    <div class="weekly-calendar">
+        <div class="days-header">
+            <div class="time-label-header"></div>
+            {% for day in week_activities.keys() %}
+                <div class="day-header">
+                    {{ day.strftime('%a %d') }}
+                    <button class="btn btn-sm btn-outline-secondary toggle-day-view">Toggle</button>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="time-rows">
+            {% for hour in range(0, 24) %}
+                <div class="time-row">
+                    <div class="time-label">{{ '{:02d}:00'.format(hour) }}</div>
+                    {% for day, activities in week_activities.items() %}
+                        <div class="day-cell" data-day="{{ day.strftime('%Y-%m-%d') }}" data-hour="{{ hour }}">
+                            {% for activity in activities %}
+                                {% if activity.start_time.hour == hour %}
+                                    <div class="activity-item" data-activity-id="{{ activity.id }}" data-category="{{ activity.category }}" style="height: {{ ((activity.end_time.hour * 60 + activity.end_time.minute) - (activity.start_time.hour * 60 + activity.start_time.minute)) / 60 * 100 }}%;">
+                                        <div class="activity-content">
+                                            <strong>{{ activity.title }}</strong><br>
+                                            <small>{{ activity.start_time.strftime('%I:%M %p') }} - {{ activity.end_time.strftime('%I:%M %p') }}</small>
+                                        </div>
+                                        <div class="activity-details">
+                                            <p><strong>Location:</strong> {{ activity.location }}</p>
+                                            <p><strong>Category:</strong> {{ activity.category }}</p>
+                                            <p><strong>Price:</strong> ${{ '%0.2f'|format(activity.price) }}</p>
+                                        </div>
                                     </div>
-                                    <div class="activity-details">
-                                        <p><strong>Location:</strong> {{ activity.location }}</p>
-                                        <p><strong>Category:</strong> {{ activity.category }}</p>
-                                        <p><strong>Price:</strong> ${{ '%0.2f'|format(activity.price) }}</p>
-                                    </div>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
     </div>
+  </div>
+  <div class="add-activity-container">
+    <a href="{{ url_for('add_activity') }}" class="btn btn-primary btn-lg">Add New Activity</a>
+  </div>
 </div>
 
 <div class="modal fade" id="activityModal" tabindex="-1" aria-labelledby="activityModalLabel" aria-hidden="true">
