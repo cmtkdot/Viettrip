@@ -21,8 +21,7 @@ def create_app():
     with app.app_context():
         from models import init_models
         Trip, Activity, Todo = init_models(db)
-        db.drop_all()  # Drop all existing tables
-        db.create_all()  # Recreate tables with updated schema
+        db.create_all()  # Uncommented this line to ensure all tables are created
 
         # Import and register blueprints/routes
         from routes import init_routes

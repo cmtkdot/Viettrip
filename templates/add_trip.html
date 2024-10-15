@@ -3,7 +3,7 @@
 {% block content %}
 <h1 class="mb-4">Add New Trip</h1>
 
-<form method="POST" action="{{ url_for('add_trip') }}">
+<form method="POST" action="{{ url_for('routes.add_trip') }}">
     <div class="mb-3">
         <label for="name" class="form-label">Trip Name</label>
         <input type="text" class="form-control" id="name" name="name" required>
@@ -16,25 +16,6 @@
         <label for="end_date" class="form-label">End Date</label>
         <input type="date" class="form-control" id="end_date" name="end_date" required>
     </div>
-    <button type="submit" class="btn btn-primary">Create Trip</button>
-    <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn-primary">Add Trip</button>
 </form>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var startDateInput = document.getElementById('start_date');
-        var endDateInput = document.getElementById('end_date');
-
-        startDateInput.addEventListener('change', function() {
-            endDateInput.min = startDateInput.value;
-            if (endDateInput.value < startDateInput.value) {
-                endDateInput.value = startDateInput.value;
-            }
-        });
-
-        endDateInput.addEventListener('change', function() {
-            startDateInput.max = endDateInput.value;
-        });
-    });
-</script>
 {% endblock %}

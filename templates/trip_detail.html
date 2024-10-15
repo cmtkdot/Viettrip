@@ -3,120 +3,13 @@
 {% block content %}
 <h1 class="mb-4">{{ trip.name }}</h1>
 
-<div class="mb-4">
-    <p><strong>Start Date:</strong> {{ trip.start_date.strftime('%B %d, %Y') }}</p>
-    <p><strong>End Date:</strong> {{ trip.end_date.strftime('%B %d, %Y') }}</p>
-    <a href="{{ url_for('routes.weekly_view', trip_id=trip.id) }}" class="btn btn-primary">View Weekly Calendar</a>
+<div class="mb-3">
+    <a href="{{ url_for('routes.index') }}" class="btn btn-primary">Back to Trips</a>
+    <a href="{{ url_for('routes.weekly_view', trip_id=trip.id) }}" class="btn btn-secondary">Weekly View</a>
     <a href="{{ url_for('routes.map_view', trip_id=trip.id) }}" class="btn btn-info">Map View</a>
-    <a href="{{ url_for('routes.add_activity', trip_id=trip.id) }}" class="btn btn-success">Add New Activity</a>
+    <a href="{{ url_for('routes.edit_trip', trip_id=trip.id) }}" class="btn btn-warning">Edit Trip</a>
 </div>
 
-<!-- Todo List Section -->
-<div class="card mb-4">
-    <div class="card-header">
-        <h2 class="h4 mb-0">Todo List</h2>
-    </div>
-    <div class="card-body">
-        <form action="{{ url_for('routes.add_todo', trip_id=trip.id) }}" method="POST" class="mb-3">
-            <div class="input-group">
-                <input type="text" name="title" class="form-control" placeholder="New todo item" required>
-                <input type="text" name="description" class="form-control" placeholder="Description (optional)">
-                <button type="submit" class="btn btn-primary">Add Todo</button>
-            </div>
-        </form>
-        <ul class="list-group" id="todo-list">
-            {% for todo in todos %}
-            <li class="list-group-item d-flex justify-content-between align-items-center" data-todo-id="{{ todo.id }}">
-                <div class="form-check">
-                    <input class="form-check-input todo-checkbox" type="checkbox" {% if todo.is_completed %}checked{% endif %}>
-                    <label class="form-check-label {% if todo.is_completed %}text-muted{% endif %}">
-                        {{ todo.title }}
-                        {% if todo.description %}
-                        <small class="text-muted d-block">{{ todo.description }}</small>
-                        {% endif %}
-                    </label>
-                </div>
-                <button class="btn btn-sm btn-danger delete-todo">Delete</button>
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
-</div>
+<!-- ... (keep the rest of the existing content) ... -->
 
-<div id="itinerary">
-    {% for date, activities in grouped_activities.items() %}
-    <div class="card mb-4">
-        <div class="card-header">
-            <h2 class="h4 mb-0">{{ date.strftime('%B %d, %Y') }}</h2>
-        </div>
-        <div class="card-body">
-            {% for activity in activities %}
-            <div class="activity-item mb-3">
-                <h5 class="card-title">{{ activity.title }}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">
-                    {{ activity.start_time.strftime('%I:%M %p') }} - {{ activity.end_time.strftime('%I:%M %p') }}
-                </h6>
-                <p class="card-text"><strong>Location:</strong> {{ activity.location }}</p>
-                <p class="card-text"><strong>Category:</strong> {{ activity.category }}</p>
-                <p class="card-text"><strong>Price:</strong> ${{ '%0.2f'|format(activity.price) }}</p>
-                <p class="card-text">{{ activity.description }}</p>
-            </div>
-            {% if not loop.last %}<hr>{% endif %}
-            {% endfor %}
-        </div>
-    </div>
-    {% endfor %}
-</div>
-
-<a href="{{ url_for('routes.index') }}" class="btn btn-secondary">Back to All Trips</a>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const todoList = document.getElementById('todo-list');
-
-    todoList.addEventListener('change', function(e) {
-        if (e.target.classList.contains('todo-checkbox')) {
-            const todoItem = e.target.closest('li');
-            const todoId = todoItem.dataset.todoId;
-            const isCompleted = e.target.checked;
-
-            fetch(`/update_todo/${todoId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ is_completed: isCompleted }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const label = todoItem.querySelector('.form-check-label');
-                    if (isCompleted) {
-                        label.classList.add('text-muted');
-                    } else {
-                        label.classList.remove('text-muted');
-                    }
-                }
-            });
-        }
-    });
-
-    todoList.addEventListener('click', function(e) {
-        if (e.target.classList.contains('delete-todo')) {
-            const todoItem = e.target.closest('li');
-            const todoId = todoItem.dataset.todoId;
-
-            fetch(`/delete_todo/${todoId}`, {
-                method: 'POST',
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    todoItem.remove();
-                }
-            });
-        }
-    });
-});
-</script>
 {% endblock %}

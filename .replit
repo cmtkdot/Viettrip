@@ -1,7 +1,34 @@
+run = "python main.py"
 modules = ["python-3.11"]
+
+[env]
+FLASK_APP = "main.py"
+FLASK_ENV = "development"
+
+[languages.python]
+pattern = "**/*.py"
+
+[languages.python.languageServer]
+start = "pylsp"
 
 [nix]
 channel = "stable-24_05"
+
+[[ports]]
+localPort = 5000
+externalPort = 5000
+
+[[ports]]
+localPort = 5001
+externalPort = 80
+
+[[ports]]
+localPort = 8080
+externalPort = 8080
+
+[[ports]]
+localPort = 8081
+externalPort = 8081
 
 [workflows]
 runButton = "Project"
@@ -13,14 +40,10 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Start Flask Server"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Add Sample Activities"
+args = "Flask Server"
 
 [[workflows.workflow]]
-name = "Start Flask Server"
+name = "Flask Server"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -28,32 +51,8 @@ agentRequireRestartOnSave = false
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python main.py"
+args = "python3 main.py"
 waitForPort = 5000
 
-[[workflows.workflow]]
-name = "Add Sample Activities"
-author = "agent"
-
-[workflows.workflow.metadata]
-agentRequireRestartOnSave = false
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "python add_sample_activities.py"
-
 [deployment]
-run = ["sh", "-c", "python main.py"]
-
-[[ports]]
-localPort = 3000
-externalPort = 3000
-
-[[ports]]
-localPort = 5000
-externalPort = 80
-exposeLocalhost = true
-
-[[ports]]
-localPort = 8080
-externalPort = 8080
+run = ["sh", "-c", "python3 main.py"]

@@ -3,7 +3,7 @@
 {% block content %}
 <h1 class="mb-4">Add New Activity for {{ trip.name }}</h1>
 
-<form method="POST" action="{{ url_for('add_activity', trip_id=trip.id) }}">
+<form method="POST" action="{{ url_for('routes.add_activity', trip_id=trip.id) }}">
     <div class="mb-3">
         <label for="date" class="form-label">Date</label>
         <input type="date" class="form-control" id="date" name="date" required min="{{ trip.start_date }}" max="{{ trip.end_date }}">
@@ -44,7 +44,7 @@
     <input type="hidden" id="latitude" name="latitude">
     <input type="hidden" id="longitude" name="longitude">
     <button type="submit" class="btn btn-primary">Add Activity</button>
-    <a href="{{ url_for('trip_detail', trip_id=trip.id) }}" class="btn btn-secondary">Cancel</a>
+    <a href="{{ url_for('routes.trip_detail', trip_id=trip.id) }}" class="btn btn-secondary">Cancel</a>
 </form>
 
 <script>

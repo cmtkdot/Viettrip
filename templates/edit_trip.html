@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">Edit Trip</h1>
+
+<form method="POST">
+    <div class="form-group">
+        <label for="name">Trip Name</label>
+        <input type="text" class="form-control" id="name" name="name" value="{{ trip.name }}" required>
+    </div>
+    <div class="form-group">
+        <label for="start_date">Start Date</label>
+        <input type="date" class="form-control" id="start_date" name="start_date" value="{{ trip.start_date.strftime('%Y-%m-%d') }}" required>
+    </div>
+    <div class="form-group">
+        <label for="end_date">End Date</label>
+        <input type="date" class="form-control" id="end_date" name="end_date" value="{{ trip.end_date.strftime('%Y-%m-%d') }}" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Update Trip</button>
+    <a href="{{ url_for('routes.index') }}" class="btn btn-secondary">Cancel</a>
+</form>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+{% endblock %}

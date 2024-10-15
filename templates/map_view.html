@@ -1,180 +1,68 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 class="mb-4">Map View</h1>
+<h1 class="mb-4">{{ trip.name }} - Map View</h1>
 
-<div class="row mb-3">
-  <div class="col-md-6">
-    <div id="category-legend" class="mb-3">
-      <h5>Categories:</h5>
-      <div id="legend-items"></div>
-    </div>
-  </div>
-  <div class="col-md-6">
-    <div id="category-filter" class="mb-3">
-      <h5>Filter by Category:</h5>
-      <div id="filter-checkboxes"></div>
-    </div>
-  </div>
+<div class="mb-3">
+    <a href="{{ url_for('routes.trip_detail', trip_id=trip.id) }}" class="btn btn-primary">Back to Trip Detail</a>
 </div>
 
-<div class="row mb-3">
-  <div class="col-md-12">
-    <button id="toggle-route" class="btn btn-primary">Toggle Route</button>
-  </div>
-</div>
-
-<div class="map-and-list-container">
-  <div id="map" style="height: 600px; width: 70%;"></div>
-  <div id="activity-list" style="width: 30%; overflow-y: auto; height: 600px;">
-    <h2>Activities</h2>
-    <ul class="list-group">
-    {% for activity in activities %}
-      <li class="list-group-item" data-category="{{ activity.category }}">
-        <h5>{{ activity.title }}</h5>
-        <p>Date: {{ activity.date }}</p>
-        <p>Time: {{ activity.start_time }} - {{ activity.end_time }}</p>
-        <p>Location: {{ activity.location }}</p>
-        <p>Category: {{ activity.category }}</p>
-      </li>
-    {% endfor %}
-    </ul>
-  </div>
-</div>
+<div id="map" style="height: 600px; width: 100%;"></div>
 
 <script>
-    let map;
-    let markers = [];
-    let polyline;
-    let activities = {{ activities|tojson|safe }};
-    const categoryColors = {
-        'Travel': '#FF0000',
-        'Accommodation': '#00FF00',
-        'Sightseeing': '#0000FF',
-        'Cultural': '#FFFF00',
-        'Food': '#FF00FF',
-        'Entertainment': '#00FFFF',
-        'Historical': '#FFA500'
-    };
+function initMap() {
+    const map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 6,
+        center: {lat: 16.0, lng: 106.0}  // Center of Vietnam
+    });
 
-    function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
-            center: {lat: 16.0, lng: 106.0},
-            zoom: 6
-        });
+    const activities = {{ activities|tojson|safe }};
+    const markers = [];
+    const bounds = new google.maps.LatLngBounds();
 
-        let bounds = new google.maps.LatLngBounds();
-        let infoWindow = new google.maps.InfoWindow();
+    activities.forEach(activity => {
+        if (activity.latitude && activity.longitude) {
+            const marker = new google.maps.Marker({
+                position: {lat: activity.latitude, lng: activity.longitude},
+                map: map,
+                title: activity.title
+            });
 
-        activities.forEach(function(activity) {
-            if (activity.latitude && activity.longitude) {
-                let position = new google.maps.LatLng(activity.latitude, activity.longitude);
-                let marker = new google.maps.Marker({
-                    position: position,
-                    map: map,
-                    title: activity.title,
-                    icon: {
-                        path: google.maps.SymbolPath.CIRCLE,
-                        fillColor: categoryColors[activity.category],
-                        fillOpacity: 1,
-                        strokeWeight: 0,
-                        scale: 8
-                    }
-                });
+            const infoWindow = new google.maps.InfoWindow({
+                content: `<h5>${activity.title}</h5>
+                          <p><strong>Date:</strong> ${activity.date}</p>
+                          <p><strong>Time:</strong> ${activity.start_time} - ${activity.end_time}</p>
+                          <p><strong>Location:</strong> ${activity.location}</p>
+                          <p><strong>Category:</strong> ${activity.category}</p>`
+            });
 
-                bounds.extend(position);
-                markers.push(marker);
+            marker.addListener('click', () => {
+                infoWindow.open(map, marker);
+            });
 
-                marker.addListener('click', function() {
-                    let content = `<b>${activity.title}</b><br>
-                                   Date: ${activity.date}<br>
-                                   Time: ${activity.start_time} - ${activity.end_time}<br>
-                                   Location: ${activity.location}<br>
-                                   Category: ${activity.category}<br>
-                                   Price: $${parseFloat(activity.price).toFixed(2)}`;
-                    infoWindow.setContent(content);
-                    infoWindow.open(map, marker);
-                });
-            }
-        });
-
-        if (markers.length > 0) {
-            map.fitBounds(bounds);
-        }
-
-        createLegend();
-        createCategoryFilter();
-        drawRoute();
-    }
-
-    function createLegend() {
-        const legendDiv = document.getElementById('legend-items');
-        Object.entries(categoryColors).forEach(([category, color]) => {
-            const item = document.createElement('div');
-            item.innerHTML = `<span style="background-color:${color}; width: 20px; height: 20px; display: inline-block; margin-right: 5px;"></span>${category}`;
-            legendDiv.appendChild(item);
-        });
-    }
-
-    function createCategoryFilter() {
-        const filterDiv = document.getElementById('filter-checkboxes');
-        Object.keys(categoryColors).forEach(category => {
-            const checkbox = document.createElement('div');
-            checkbox.className = 'form-check';
-            checkbox.innerHTML = `
-                <input class="form-check-input" type="checkbox" value="${category}" id="filter-${category}" checked>
-                <label class="form-check-label" for="filter-${category}">${category}</label>
-            `;
-            filterDiv.appendChild(checkbox);
-            checkbox.querySelector('input').addEventListener('change', filterMarkers);
-        });
-    }
-
-    function filterMarkers() {
-        const checkedCategories = Array.from(document.querySelectorAll('#filter-checkboxes input:checked')).map(cb => cb.value);
-        markers.forEach((marker, i) => {
-            const category = activities[i].category;
-            marker.setVisible(checkedCategories.includes(category));
-        });
-        document.querySelectorAll('#activity-list li').forEach(li => {
-            li.style.display = checkedCategories.includes(li.dataset.category) ? '' : 'none';
-        });
-        if (polyline) {
-            drawRoute();
-        }
-    }
-
-    function drawRoute() {
-        if (polyline) {
-            polyline.setMap(null);
-        }
-        const checkedCategories = Array.from(document.querySelectorAll('#filter-checkboxes input:checked')).map(cb => cb.value);
-        const filteredMarkers = markers.filter((marker, i) => checkedCategories.includes(activities[i].category));
-        const path = filteredMarkers.map(marker => marker.getPosition());
-        polyline = new google.maps.Polyline({
-            path: path,
-            geodesic: true,
-            strokeColor: '#FF0000',
-            strokeOpacity: 1.0,
-            strokeWeight: 2
-        });
-        polyline.setMap(map);
-    }
-
-    document.getElementById('toggle-route').addEventListener('click', function() {
-        if (polyline) {
-            polyline.setVisible(!polyline.getVisible());
+            markers.push(marker);
+            bounds.extend(marker.getPosition());
         }
     });
 
-    // Update the initGoogleMaps function to initialize the map
-    function initGoogleMaps() {
-        if (typeof google === 'undefined') {
-            setTimeout(initGoogleMaps, 100);
-            return;
-        }
-        console.log("Google Maps API loaded successfully");
-        initMap();
+    if (markers.length > 0) {
+        map.fitBounds(bounds);
     }
+
+    // Draw route
+    const path = markers.map(marker => marker.getPosition());
+    const route = new google.maps.Polyline({
+        path: path,
+        geodesic: true,
+        strokeColor: '#FF0000',
+        strokeOpacity: 1.0,
+        strokeWeight: 2
+    });
+
+    route.setMap(map);
+}
+</script>
+<script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFEcOBZtIfolnyQ03QQwVzzwWJbA1ErUA&callback=initMap">
 </script>
 {% endblock %}
