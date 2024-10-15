@@ -12,12 +12,22 @@ document.addEventListener('DOMContentLoaded', function() {
     if (prevWeekBtn && nextWeekBtn && weekRangeElement) {
         let currentWeekStart = moment(weekRangeElement.textContent.split(' - ')[0], 'MMMM D, YYYY');
 
+        // Initialize date inputs with trip's start and end dates
+        const startDateInput = document.getElementById('start-date');
+        const endDateInput = document.getElementById('end-date');
+        startDateInput.value = '2024-10-28';
+        endDateInput.value = '2024-11-13';
+
         function updateWeekView(weekStart) {
             const weekEnd = moment(weekStart).add(6, 'days');
             weekRangeElement.textContent = `${weekStart.format('MMMM D, YYYY')} - ${weekEnd.format('MMMM D, YYYY')}`;
             
-            // Fetch new data for the week and update the calendar
-            fetch(`/weekly_view_data?start_date=${weekStart.format('YYYY-MM-DD')}&end_date=${weekEnd.format('YYYY-MM-DD')}&categories=${selectedCategories.join(',')}`)
+            // Use the selected date range if available, otherwise use the current week
+            const fetchStartDate = startDate || weekStart.format('YYYY-MM-DD');
+            const fetchEndDate = endDate || weekEnd.format('YYYY-MM-DD');
+
+            // Fetch new data for the selected date range and update the calendar
+            fetch(`/weekly_view_data?start_date=${fetchStartDate}&end_date=${fetchEndDate}&categories=${selectedCategories.join(',')}`)
                 .then(response => response.json())
                 .then(data => {
                     updateWeeklyCalendar(data);
@@ -126,11 +136,25 @@ document.addEventListener('DOMContentLoaded', function() {
             if (startDate && endDate) {
                 currentWeekStart = moment(startDate);
                 updateWeekView(currentWeekStart);
+                
+                // Add visual feedback
+                const feedbackElement = document.createElement('div');
+                feedbackElement.className = 'alert alert-success mt-3';
+                feedbackElement.textContent = `Date filter applied: ${startDate} to ${endDate}`;
+                dateFilterForm.appendChild(feedbackElement);
+                
+                // Remove the feedback after 3 seconds
+                setTimeout(() => {
+                    feedbackElement.remove();
+                }, 3000);
             }
         });
 
         // Initialize selected categories
         selectedCategories = Array.from(document.querySelectorAll('#category-filter-form input[type="checkbox"]:checked')).map(checkbox => checkbox.value);
+        
+        // Initial update
+        updateWeekView(currentWeekStart);
     }
 
     // Activity details modal
