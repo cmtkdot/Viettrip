@@ -3,19 +3,36 @@ from flask_cors import CORS
 from models import db, Trip
 import os
 from dotenv import load_dotenv
-from werkzeug.urls import quote as url_quote
+from werkzeug.urls import url_quote
 
+print("Starting to load environment variables...")
 load_dotenv()
+print("Environment variables loaded.")
 
+print("Creating Flask app...")
 app = Flask(__name__)
 CORS(app)
+print("Flask app created and CORS initialized.")
 
 # Database configuration
+print("Configuring database...")
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
+print(f"Database URL: {app.config['SQLALCHEMY_DATABASE_URI']}")
+print(f"Secret Key set: {'Yes' if app.config['SECRET_KEY'] else 'No'}")
 
+print("Initializing database...")
 db.init_app(app)
+print("Database initialized.")
+
+@app.route('/')
+def root():
+    return jsonify({"message": "Welcome to the Trip Planner API"}), 200
+
+@app.route('/api/health')
+def health_check():
+    return jsonify({"status": "healthy"}), 200
 
 @app.route('/api/trips', methods=['GET', 'POST'])
 def trips():
@@ -54,6 +71,10 @@ def trip(trip_id):
         return '', 204
 
 if __name__ == '__main__':
+    print("Creating all database tables...")
     with app.app_context():
         db.create_all()
-    app.run(debug=True, port=5000)
+    print("Database tables created.")
+    print("Starting Flask server...")
+    app.run(debug=True, host='0.0.0.0', port=5000)
+    print("Flask server started.")
