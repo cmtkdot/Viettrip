@@ -3,6 +3,22 @@
 {% block content %}
 <h1 class="mb-4">Weekly View</h1>
 
+<form id="date-filter-form" class="mb-3">
+  <div class="row">
+    <div class="col">
+      <label for="start-date" class="form-label">Start Date</label>
+      <input type="date" id="start-date" name="start-date" class="form-control" min="2024-10-28" max="2024-11-13" required>
+    </div>
+    <div class="col">
+      <label for="end-date" class="form-label">End Date</label>
+      <input type="date" id="end-date" name="end-date" class="form-control" min="2024-10-28" max="2024-11-13" required>
+    </div>
+    <div class="col-auto align-self-end">
+      <button type="submit" class="btn btn-primary">Filter</button>
+    </div>
+  </div>
+</form>
+
 <form id="category-filter-form" class="mb-3">
   <div class="row">
     <div class="col">

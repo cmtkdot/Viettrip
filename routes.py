@@ -44,6 +44,8 @@ def get_activities():
 
 @app.route('/weekly_view')
 def weekly_view():
+    trip_start_date = datetime(2024, 10, 28).date()
+    trip_end_date = datetime(2024, 11, 13).date()
     today = datetime.now().date()
     start_of_week = today - timedelta(days=today.weekday())
     end_of_week = start_of_week + timedelta(days=6)
@@ -57,19 +59,20 @@ def weekly_view():
     for activity in activities:
         week_activities[activity.date].append(activity)
     
-    return render_template('weekly_view.html', week_activities=week_activities, start_of_week=start_of_week, timedelta=timedelta)
+    return render_template('weekly_view.html', week_activities=week_activities, start_of_week=start_of_week, timedelta=timedelta, trip_start_date=trip_start_date, trip_end_date=trip_end_date)
 
 @app.route('/weekly_view_data')
 def weekly_view_data():
     start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
     categories = request.args.get('categories', '').split(',')
     
-    if start_date:
+    if start_date and end_date:
         start_of_week = datetime.strptime(start_date, '%Y-%m-%d').date()
+        end_of_week = datetime.strptime(end_date, '%Y-%m-%d').date()
     else:
         start_of_week = datetime.now().date() - timedelta(days=datetime.now().weekday())
-    
-    end_of_week = start_of_week + timedelta(days=6)
+        end_of_week = start_of_week + timedelta(days=6)
     
     activities_query = Activity.query.filter(
         Activity.date >= start_of_week,
@@ -81,7 +84,7 @@ def weekly_view_data():
     
     activities = activities_query.order_by(Activity.date, Activity.start_time).all()
     
-    week_activities = {(start_of_week + timedelta(days=i)).isoformat(): [] for i in range(7)}
+    week_activities = {(start_of_week + timedelta(days=i)).isoformat(): [] for i in range((end_of_week - start_of_week).days + 1)}
     for activity in activities:
         activity_dict = activity.to_dict()
         activity_dict['start_minutes'] = activity.start_time.hour * 60 + activity.start_time.minute

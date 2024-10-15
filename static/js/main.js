@@ -4,17 +4,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const nextWeekBtn = document.getElementById('nextWeek');
     const weekRangeElement = document.getElementById('weekRange');
     const categoryFilterForm = document.getElementById('category-filter-form');
+    const dateFilterForm = document.getElementById('date-filter-form');
     let selectedCategories = [];
+    let startDate = null;
+    let endDate = null;
 
     if (prevWeekBtn && nextWeekBtn && weekRangeElement) {
         let currentWeekStart = moment(weekRangeElement.textContent.split(' - ')[0], 'MMMM D, YYYY');
 
-        function updateWeekView(startDate) {
-            const endDate = moment(startDate).add(6, 'days');
-            weekRangeElement.textContent = `${startDate.format('MMMM D, YYYY')} - ${endDate.format('MMMM D, YYYY')}`;
+        function updateWeekView(weekStart) {
+            const weekEnd = moment(weekStart).add(6, 'days');
+            weekRangeElement.textContent = `${weekStart.format('MMMM D, YYYY')} - ${weekEnd.format('MMMM D, YYYY')}`;
             
             // Fetch new data for the week and update the calendar
-            fetch(`/weekly_view_data?start_date=${startDate.format('YYYY-MM-DD')}&categories=${selectedCategories.join(',')}`)
+            fetch(`/weekly_view_data?start_date=${weekStart.format('YYYY-MM-DD')}&end_date=${weekEnd.format('YYYY-MM-DD')}&categories=${selectedCategories.join(',')}`)
                 .then(response => response.json())
                 .then(data => {
                     updateWeeklyCalendar(data);
@@ -113,6 +116,17 @@ document.addEventListener('DOMContentLoaded', function() {
             event.preventDefault();
             selectedCategories = Array.from(document.querySelectorAll('#category-filter-form input[type="checkbox"]:checked')).map(checkbox => checkbox.value);
             updateWeekView(currentWeekStart);
+        });
+
+        // Handle date filter form submission
+        dateFilterForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            startDate = document.getElementById('start-date').value;
+            endDate = document.getElementById('end-date').value;
+            if (startDate && endDate) {
+                currentWeekStart = moment(startDate);
+                updateWeekView(currentWeekStart);
+            }
         });
 
         // Initialize selected categories
