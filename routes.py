@@ -31,7 +31,9 @@ def init_routes(db, Trip, Activity, Todo):
                 'location': activity.location,
                 'category': activity.category,
                 'latitude': activity.latitude,
-                'longitude': activity.longitude
+                'longitude': activity.longitude,
+                'price': float(activity.price) if activity.price else 0,
+                'description': activity.description
             } for activity in activities]
             
             return render_template('map_view.html', trip=trip, activities=activities_data)
@@ -115,6 +117,8 @@ def init_routes(db, Trip, Activity, Todo):
             category = request.form['category']
             latitude = float(request.form['latitude'])
             longitude = float(request.form['longitude'])
+            price = float(request.form['price'])
+            description = request.form['description']
 
             new_activity = Activity(
                 trip_id=trip_id,
@@ -125,7 +129,9 @@ def init_routes(db, Trip, Activity, Todo):
                 location=location,
                 category=category,
                 latitude=latitude,
-                longitude=longitude
+                longitude=longitude,
+                price=price,
+                description=description
             )
             db.session.add(new_activity)
             db.session.commit()
@@ -146,6 +152,8 @@ def init_routes(db, Trip, Activity, Todo):
             activity.category = request.form['category']
             activity.latitude = float(request.form['latitude'])
             activity.longitude = float(request.form['longitude'])
+            activity.price = float(request.form['price'])
+            activity.description = request.form['description']
             db.session.commit()
             flash('Activity updated successfully!', 'success')
             return redirect(url_for('routes.trip_detail', trip_id=activity.trip_id))
@@ -177,7 +185,7 @@ def init_routes(db, Trip, Activity, Todo):
                     csv_input = csv.reader(stream)
                     next(csv_input)  # Skip header row
                     for row in csv_input:
-                        title, date, start_time, end_time, location, category, latitude, longitude = row
+                        title, date, start_time, end_time, location, category, latitude, longitude, price, description = row
                         new_activity = Activity(
                             trip_id=trip_id,
                             title=title,
@@ -187,7 +195,9 @@ def init_routes(db, Trip, Activity, Todo):
                             location=location,
                             category=category,
                             latitude=float(latitude),
-                            longitude=float(longitude)
+                            longitude=float(longitude),
+                            price=float(price),
+                            description=description
                         )
                         db.session.add(new_activity)
                     db.session.commit()
@@ -202,4 +212,4 @@ def init_routes(db, Trip, Activity, Todo):
                 return redirect(request.url)
         return render_template('import_activities.html', trip=trip)
 
-# Do not return bp from init_routes
+    return bp

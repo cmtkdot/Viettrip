@@ -1,30 +1,37 @@
-run = "npm install && npx concurrently \"python main.py\" \"npm run dev\""
-modules = ["nodejs-20", "python-3.11"]
+run = "npm run dev"
+build = "npm run build"
+modules = ["nodejs-20"]
 
 [env]
-FLASK_APP = "main.py"
-FLASK_ENV = "development"
-
-[languages.python]
-pattern = "**/*.py"
-
-[languages.python.languageServer]
-start = "pylsp"
+PATH = "/home/runner/$REPL_SLUG/.config/npm/node_global/bin:/home/runner/$REPL_SLUG/node_modules/.bin"
+npm_config_prefix = "/home/runner/$REPL_SLUG/.config/npm/node_global"
 
 [nix]
-channel = "stable-24_05"
+channel = "stable-22_11"
+
+[packager]
+language = "nodejs"
+
+[packager.features]
+packageSearch = true
+guessImports = true
+enabledForHosting = true
+
+[languages.javascript]
+pattern = "**/{*.js,*.jsx,*.ts,*.tsx}"
+syntax = "javascript"
+
+[languages.javascript.languageServer]
+start = [ "typescript-language-server", "--stdio" ]
+
+[deployment]
+run = ["npm", "run", "start"]
+build = ["npm", "run", "build"]
+deploymentTarget = "gce"
 
 [[ports]]
 localPort = 3000
-externalPort = 3000
-
-[[ports]]
-localPort = 3001
-externalPort = 3001
-
-[[ports]]
-localPort = 3002
-externalPort = 3002
+externalPort = 80
 
 [[ports]]
 localPort = 5000
@@ -32,15 +39,7 @@ externalPort = 5000
 
 [[ports]]
 localPort = 5001
-externalPort = 80
-
-[[ports]]
-localPort = 8080
-externalPort = 8080
-
-[[ports]]
-localPort = 8081
-externalPort = 8081
+externalPort = 3000
 
 [workflows]
 runButton = "Project"
@@ -52,26 +51,10 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Flask Server"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Next.js Server"
+args = "Next.js Dev Server"
 
 [[workflows.workflow]]
-name = "Flask Server"
-author = "agent"
-
-[workflows.workflow.metadata]
-agentRequireRestartOnSave = false
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "python3 main.py"
-waitForPort = 5000
-
-[[workflows.workflow]]
-name = "Next.js Server"
+name = "Next.js Dev Server"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -80,7 +63,4 @@ agentRequireRestartOnSave = false
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run dev"
-waitForPort = 3001
-
-[deployment]
-run = ["sh", "-c", "npm install && npx concurrently \"python3 main.py\" \"npm run dev\""]
+waitForPort = 3000

@@ -1,42 +1,89 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trip Planner Map View</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}"></script>
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+        #trip-selector {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Trip Planner Map View</h1>
+    <select id="trip-selector">
+        <option value="">All Trips</option>
+    </select>
+    <div id="map"></div>
+    <script>
+        let map;
+        let markers = [];
 
-{% block content %}
-<h1 class="mb-4">Trip Itinerary Planner</h1>
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: 0, lng: 0 },
+                zoom: 2
+            });
 
-<div class="mb-4">
-    <a href="{{ url_for('routes.add_trip') }}" class="btn btn-primary">Add New Trip</a>
-</div>
+            fetchTrips();
+            document.getElementById('trip-selector').addEventListener('change', onTripSelect);
+        }
 
-<div id="trips">
-    {% if trips %}
-        {% for trip in trips %}
-        <div class="card mb-4">
-            <div class="card-header">
-                <h2 class="h4 mb-0">{{ trip.name }}</h2>
-            </div>
-            <div class="card-body">
-                <p><strong>Start Date:</strong> {{ trip.start_date.strftime('%B %d, %Y') }}</p>
-                <p><strong>End Date:</strong> {{ trip.end_date.strftime('%B %d, %Y') }}</p>
-                <a href="{{ url_for('routes.trip_detail', trip_id=trip.id) }}" class="btn btn-primary">View Trip</a>
-                <a href="{{ url_for('routes.weekly_view', trip_id=trip.id) }}" class="btn btn-secondary">Weekly View</a>
-                <a href="{{ url_for('routes.edit_trip', trip_id=trip.id) }}" class="btn btn-warning">Edit Trip</a>
-                <form action="{{ url_for('routes.delete_trip', trip_id=trip.id) }}" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this trip?');">
-                    <button type="submit" class="btn btn-danger">Delete Trip</button>
-                </form>
-            </div>
-        </div>
-        {% endfor %}
-    {% else %}
-        <p>No trips found. Create a new trip to get started!</p>
-    {% endif %}
-</div>
+        function fetchTrips() {
+            fetch('/api/trips')
+                .then(response => response.json())
+                .then(trips => {
+                    const selector = document.getElementById('trip-selector');
+                    trips.forEach(trip => {
+                        const option = document.createElement('option');
+                        option.value = trip.id;
+                        option.textContent = trip.name;
+                        selector.appendChild(option);
+                    });
+                });
+        }
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    {% for category, message in messages %}
-      <div class="alert alert-{{ category }}">{{ message }}</div>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
+        function onTripSelect(event) {
+            const tripId = event.target.value;
+            fetchMapData(tripId);
+        }
 
-{% endblock %}
+        function fetchMapData(tripId = '') {
+            const url = tripId ? `/api/map?trip_id=${tripId}` : '/api/map';
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    updateMap(data);
+                });
+        }
+
+        function updateMap(data) {
+            clearMarkers();
+            map.setCenter(data.center);
+            map.setZoom(data.zoom);
+
+            data.markers.forEach(markerInfo => {
+                const marker = new google.maps.Marker({
+                    position: { lat: markerInfo.lat, lng: markerInfo.lng },
+                    map: map,
+                    title: markerInfo.title
+                });
+                markers.push(marker);
+            });
+        }
+
+        function clearMarkers() {
+            markers.forEach(marker => marker.setMap(null));
+            markers = [];
+        }
+
+        window.onload = initMap;
+    </script>
+</body>
+</html>

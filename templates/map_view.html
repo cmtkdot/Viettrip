@@ -9,60 +9,46 @@
 
 <div id="map" style="height: 600px; width: 100%;"></div>
 
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
 <script>
 function initMap() {
-    const map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 6,
-        center: {lat: 16.0, lng: 106.0}  // Center of Vietnam
-    });
+    const map = L.map('map').setView([16.0, 106.0], 6);  // Center of Vietnam
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
 
     const activities = {{ activities|tojson|safe }};
     const markers = [];
-    const bounds = new google.maps.LatLngBounds();
+    const routeCoordinates = [];
 
     activities.forEach(activity => {
         if (activity.latitude && activity.longitude) {
-            const marker = new google.maps.Marker({
-                position: {lat: activity.latitude, lng: activity.longitude},
-                map: map,
-                title: activity.title
-            });
-
-            const infoWindow = new google.maps.InfoWindow({
-                content: `<h5>${activity.title}</h5>
-                          <p><strong>Date:</strong> ${activity.date}</p>
-                          <p><strong>Time:</strong> ${activity.start_time} - ${activity.end_time}</p>
-                          <p><strong>Location:</strong> ${activity.location}</p>
-                          <p><strong>Category:</strong> ${activity.category}</p>`
-            });
-
-            marker.addListener('click', () => {
-                infoWindow.open(map, marker);
-            });
-
+            const marker = L.marker([activity.latitude, activity.longitude])
+                .addTo(map)
+                .bindPopup(`
+                    <h5>${activity.title}</h5>
+                    <p><strong>Date:</strong> ${activity.date}</p>
+                    <p><strong>Time:</strong> ${activity.start_time} - ${activity.end_time}</p>
+                    <p><strong>Location:</strong> ${activity.location}</p>
+                    <p><strong>Category:</strong> ${activity.category}</p>
+                `);
             markers.push(marker);
-            bounds.extend(marker.getPosition());
+            routeCoordinates.push([activity.latitude, activity.longitude]);
         }
     });
 
     if (markers.length > 0) {
+        const bounds = L.latLngBounds(routeCoordinates);
         map.fitBounds(bounds);
     }
 
     // Draw route
-    const path = markers.map(marker => marker.getPosition());
-    const route = new google.maps.Polyline({
-        path: path,
-        geodesic: true,
-        strokeColor: '#FF0000',
-        strokeOpacity: 1.0,
-        strokeWeight: 2
-    });
-
-    route.setMap(map);
+    L.polyline(routeCoordinates, {color: 'red'}).addTo(map);
 }
-</script>
-<script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDFEcOBZtIfolnyQ03QQwVzzwWJbA1ErUA&callback=initMap">
+
+document.addEventListener('DOMContentLoaded', initMap);
 </script>
 {% endblock %}

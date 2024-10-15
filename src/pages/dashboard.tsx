@@ -18,14 +18,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu"
+import TripPlanner from '../components/TripPlanner'
 
 interface Trip {
   id: number
-  destination: string
-  start_date: string
-  end_date: string
-  activities: string[]
+  name: string
+  startDate: string
+  endDate: string
+  createdAt: string
 }
+
+const API_URL = '/api';
 
 export default function Dashboard() {
   const [trips, setTrips] = useState<Trip[]>([])
@@ -35,7 +38,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchTrips = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/trips')
+        const response = await fetch(`${API_URL}/trips`)
         if (!response.ok) {
           throw new Error('Failed to fetch trips')
         }
@@ -51,10 +54,10 @@ export default function Dashboard() {
     fetchTrips()
   }, [])
 
-  const upcomingTrips = trips.filter(trip => new Date(trip.start_date) > new Date()).slice(0, 2)
+  const upcomingTrips = trips.filter(trip => new Date(trip.startDate) > new Date()).slice(0, 2)
   const recentActivities = trips.slice(0, 2).map(trip => ({
-    action: `Added trip to ${trip.destination}`,
-    date: new Date(trip.start_date).toLocaleDateString()
+    action: `Added trip: ${trip.name}`,
+    date: new Date(trip.createdAt).toLocaleDateString()
   }))
 
   if (loading) {
@@ -146,9 +149,9 @@ export default function Dashboard() {
                 <div className="space-y-2">
                   {upcomingTrips.map(trip => (
                     <div key={trip.id} className="flex items-center justify-between">
-                      <span className="font-medium">{trip.destination}</span>
+                      <span className="font-medium">{trip.name}</span>
                       <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {new Date(trip.start_date).toLocaleDateString()}
+                        {new Date(trip.startDate).toLocaleDateString()}
                       </span>
                     </div>
                   ))}
@@ -189,6 +192,9 @@ export default function Dashboard() {
                 </div>
               </CardContent>
             </Card>
+          </div>
+          <div className="mt-8">
+            <TripPlanner trips={trips} setTrips={setTrips} />
           </div>
         </main>
       </div>
