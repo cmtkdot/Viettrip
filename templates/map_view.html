@@ -3,7 +3,22 @@
 {% block content %}
 <h1 class="mb-4">Map View</h1>
 
-<div id="map" style="height: 600px;"></div>
+<div class="map-and-list-container">
+  <div id="map" style="height: 600px; width: 70%;"></div>
+  <div id="activity-list" style="width: 30%; overflow-y: auto; height: 600px;">
+    <h2>Activities</h2>
+    <ul class="list-group">
+    {% for activity in activities %}
+      <li class="list-group-item">
+        <h5>{{ activity.title }}</h5>
+        <p>Date: {{ activity.date }}</p>
+        <p>Time: {{ activity.start_time }} - {{ activity.end_time }}</p>
+        <p>Location: {{ activity.location }}</p>
+      </li>
+    {% endfor %}
+    </ul>
+  </div>
+</div>
 
 <script>
     function initMap() {
@@ -24,34 +39,32 @@
             if (activity.latitude && activity.longitude) {
                 console.log("Adding marker for:", activity.title);
                 var position = new google.maps.LatLng(activity.latitude, activity.longitude);
-                var marker = new google.maps.Marker({
+                var markerView = new google.maps.marker.AdvancedMarkerView({
                     position: position,
                     map: map,
                     title: activity.title
                 });
 
                 bounds.extend(position);
-                markers.push(marker);
+                markers.push(markerView);
 
-                google.maps.event.addListener(marker, 'click', (function(marker) {
-                    return function() {
-                        var content = "<b>" + activity.title + "</b><br>" +
-                                      "Date: " + activity.date + "<br>" +
-                                      "Time: " + activity.start_time + " - " + activity.end_time + "<br>" +
-                                      "Location: " + activity.location + "<br>" +
-                                      "Category: " + activity.category + "<br>" +
-                                      "Price: $" + activity.price.toFixed(2);
-                        infoWindow.setContent(content);
-                        infoWindow.open(map, marker);
-                    }
-                })(marker));
+                markerView.addListener('click', function() {
+                    var content = "<b>" + activity.title + "</b><br>" +
+                                  "Date: " + activity.date + "<br>" +
+                                  "Time: " + activity.start_time + " - " + activity.end_time + "<br>" +
+                                  "Location: " + activity.location + "<br>" +
+                                  "Category: " + activity.category + "<br>" +
+                                  "Price: $" + activity.price.toFixed(2);
+                    infoWindow.setContent(content);
+                    infoWindow.open(map, markerView);
+                });
             } else {
                 console.log("Missing coordinates for:", activity.title);
             }
         });
 
         // Create a polyline to connect the markers
-        var path = markers.map(function(marker) { return marker.getPosition(); });
+        var path = markers.map(function(marker) { return marker.position; });
         var polyline = new google.maps.Polyline({
             path: path,
             geodesic: true,

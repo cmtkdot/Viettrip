@@ -44,7 +44,6 @@ body {
     border-color: var(--bs-primary);
 }
 
-/* Weekly calendar styles */
 .weekly-view-container {
     display: flex;
     justify-content: space-between;
@@ -144,7 +143,6 @@ body {
     padding: 0.1rem 0.3rem;
 }
 
-/* Color-coding system for activities */
 .activity-item[data-category="Travel"] { background-color: var(--bs-info); }
 .activity-item[data-category="Accommodation"] { background-color: var(--bs-success); }
 .activity-item[data-category="Sightseeing"] { background-color: var(--bs-warning); }
@@ -153,7 +151,6 @@ body {
 .activity-item[data-category="Entertainment"] { background-color: var(--bs-secondary); }
 .activity-item[data-category="Historical"] { background-color: var(--bs-info-text); }
 
-/* Category filter form styles */
 #category-filter-form {
     background-color: var(--bs-dark);
     padding: 1rem;
@@ -177,4 +174,55 @@ body {
 #category-filter-form .btn-primary:hover {
     background-color: var(--bs-primary);
     border-color: var(--bs-primary);
+}
+
+.map-and-list-container {
+    display: flex;
+    height: 600px;
+    margin-bottom: 2rem;
+}
+
+#map {
+    flex: 7;
+    height: 100%;
+}
+
+#activity-list {
+    flex: 3;
+    overflow-y: auto;
+    padding-left: 1rem;
+    height: 100%;
+}
+
+#activity-list h2 {
+    margin-bottom: 1rem;
+}
+
+#activity-list .list-group-item {
+    margin-bottom: 0.5rem;
+}
+
+#activity-list .list-group-item h5 {
+    margin-bottom: 0.5rem;
+}
+
+#activity-list .list-group-item p {
+    margin-bottom: 0.25rem;
+}
+
+@media (max-width: 768px) {
+    .map-and-list-container {
+        flex-direction: column;
+        height: auto;
+    }
+
+    #map, #activity-list {
+        width: 100%;
+        height: 400px;
+    }
+
+    #activity-list {
+        margin-top: 1rem;
+        padding-left: 0;
+    }
 }
