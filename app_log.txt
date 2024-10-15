@@ -1220,3 +1220,171 @@ Traceback (most recent call last):
 werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'routes.weekly_view' with values ['trip_id']. Did you mean 'routes.map_view' instead?
 2024-10-15 06:18:20,115 - INFO -  * Restarting with stat
 2024-10-15 06:18:20,557 - INFO -  * Detected change in '/home/runner/workspace/main.py', reloading
+2024-10-15 06:31:29,254 - INFO - Starting the Flask application...
+2024-10-15 06:31:29,255 - INFO - About to create the app...
+2024-10-15 06:31:31,072 - INFO - App created successfully.
+2024-10-15 06:31:31,073 - INFO - Flask app created, about to run...
+2024-10-15 06:31:31,073 - INFO - Attempting to run app on port 5000
+ * Serving Flask app 'app'
+ * Debug mode: on
+2024-10-15 06:31:31,094 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.31.196.167:5000
+2024-10-15 06:31:31,096 - INFO - [33mPress CTRL+C to quit[0m
+2024-10-15 06:31:31,099 - INFO -  * Restarting with stat
+2024-10-15 06:31:31,427 - INFO - Starting the Flask application...
+2024-10-15 06:31:31,427 - INFO - About to create the app...
+2024-10-15 06:31:32,664 - INFO - App created successfully.
+2024-10-15 06:31:32,664 - INFO - Flask app created, about to run...
+2024-10-15 06:31:32,664 - INFO - Attempting to run app on port 5000
+2024-10-15 06:31:32,680 - WARNING -  * Debugger is active!
+2024-10-15 06:31:32,682 - INFO -  * Debugger PIN: 947-123-773
+2024-10-15 06:31:32,968 - INFO - 172.31.196.167 - - [15/Oct/2024 06:31:32] "GET / HTTP/1.1" 200 -
+2024-10-15 06:31:33,238 - INFO - 172.31.196.167 - - [15/Oct/2024 06:31:33] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-10-15 06:31:33,298 - INFO - 172.31.196.167 - - [15/Oct/2024 06:31:33] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2024-10-15 06:31:33,528 - INFO - 172.31.196.167 - - [15/Oct/2024 06:31:33] "GET / HTTP/1.1" 200 -
+2024-10-15 06:31:33,586 - INFO - 172.31.196.167 - - [15/Oct/2024 06:31:33] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-10-15 06:31:33,595 - INFO - 172.31.196.167 - - [15/Oct/2024 06:31:33] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2024-10-15 06:31:38,093 - INFO - 172.31.196.167 - - [15/Oct/2024 06:31:38] "[35m[1mGET /weekly_view/1 HTTP/1.1[0m" 500 -
+2024-10-15 06:31:38,166 - INFO - 172.31.196.167 - - [15/Oct/2024 06:31:38] "GET /weekly_view/1?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2024-10-15 06:31:38,167 - INFO - 172.31.196.167 - - [15/Oct/2024 06:31:38] "GET /weekly_view/1?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2024-10-15 06:31:43,933 - INFO - 172.31.196.167 - - [15/Oct/2024 06:31:43] "GET /trip/1 HTTP/1.1" 200 -
+2024-10-15 06:31:43,992 - INFO - 172.31.196.167 - - [15/Oct/2024 06:31:43] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-10-15 06:31:44,006 - INFO - 172.31.196.167 - - [15/Oct/2024 06:31:44] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2024-10-15 06:32:58,901 - INFO - 172.31.196.167 - - [15/Oct/2024 06:32:58] "GET / HTTP/1.1" 200 -
+2024-10-15 06:32:58,967 - INFO - 172.31.196.167 - - [15/Oct/2024 06:32:58] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-10-15 06:32:58,974 - INFO - 172.31.196.167 - - [15/Oct/2024 06:32:58] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2024-10-15 06:33:01,137 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:01] "[32mPOST /create_vietnam_trip HTTP/1.1[0m" 302 -
+2024-10-15 06:33:01,418 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:01] "GET / HTTP/1.1" 200 -
+2024-10-15 06:33:01,476 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:01] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-10-15 06:33:01,485 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:01] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2024-10-15 06:33:08,661 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:08] "[32mPOST /delete_trip/3 HTTP/1.1[0m" 302 -
+2024-10-15 06:33:08,943 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:08] "GET / HTTP/1.1" 200 -
+2024-10-15 06:33:09,019 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:09] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-10-15 06:33:09,020 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:09] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2024-10-15 06:33:11,793 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:11] "GET /trip/1 HTTP/1.1" 200 -
+2024-10-15 06:33:11,857 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:11] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-10-15 06:33:11,867 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:11] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2024-10-15 06:33:14,656 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:14] "GET /map_view/1 HTTP/1.1" 200 -
+2024-10-15 06:33:14,716 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:14] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2024-10-15 06:33:14,718 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:14] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-10-15 06:33:18,314 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:18] "GET /trip/1 HTTP/1.1" 200 -
+2024-10-15 06:33:18,376 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:18] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2024-10-15 06:33:18,377 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:18] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-10-15 06:33:20,816 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:20] "GET /edit_trip/1 HTTP/1.1" 200 -
+2024-10-15 06:33:20,883 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:20] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2024-10-15 06:33:20,887 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:20] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-10-15 06:33:22,740 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:22] "[32mPOST /edit_trip/1 HTTP/1.1[0m" 302 -
+2024-10-15 06:33:23,018 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:23] "GET / HTTP/1.1" 200 -
+2024-10-15 06:33:23,083 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:23] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-10-15 06:33:23,092 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:23] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2024-10-15 06:33:25,679 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:25] "GET /trip/1 HTTP/1.1" 200 -
+2024-10-15 06:33:25,745 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:25] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2024-10-15 06:33:25,746 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:25] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-10-15 06:33:50,462 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:50] "GET /edit_trip/1 HTTP/1.1" 200 -
+2024-10-15 06:33:50,531 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:50] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-10-15 06:33:50,532 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:50] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2024-10-15 06:33:52,394 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:52] "[32mPOST /edit_trip/1 HTTP/1.1[0m" 302 -
+2024-10-15 06:33:52,673 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:52] "GET / HTTP/1.1" 200 -
+2024-10-15 06:33:52,744 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:52] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2024-10-15 06:33:52,744 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:52] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-10-15 06:33:56,373 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:56] "[35m[1mGET /weekly_view/1 HTTP/1.1[0m" 500 -
+2024-10-15 06:33:56,436 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:56] "[36mGET /weekly_view/1?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-10-15 06:33:56,437 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:56] "[36mGET /weekly_view/1?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2024-10-15 06:33:58,237 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:58] "GET /edit_trip/1 HTTP/1.1" 200 -
+2024-10-15 06:33:58,301 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:58] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-10-15 06:33:58,301 - INFO - 172.31.196.167 - - [15/Oct/2024 06:33:58] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2024-10-15 06:34:00,055 - INFO - 172.31.196.167 - - [15/Oct/2024 06:34:00] "GET / HTTP/1.1" 200 -
+2024-10-15 06:34:00,118 - INFO - 172.31.196.167 - - [15/Oct/2024 06:34:00] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-10-15 06:34:00,119 - INFO - 172.31.196.167 - - [15/Oct/2024 06:34:00] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2024-10-15 06:34:01,389 - INFO - 172.31.196.167 - - [15/Oct/2024 06:34:01] "GET /trip/1 HTTP/1.1" 200 -
+2024-10-15 06:34:01,465 - INFO - 172.31.196.167 - - [15/Oct/2024 06:34:01] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2024-10-15 06:34:01,466 - INFO - 172.31.196.167 - - [15/Oct/2024 06:34:01] "[36mGET /static/css/custom.css HTTP/1.1[0m" 304 -
+2024-10-15 06:34:04,655 - INFO - 172.31.196.167 - - [15/Oct/2024 06:34:04] "[35m[1mGET /weekly_view/1 HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 1498, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 1476, in wsgi_app
+    response = self.handle_exception(e)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/routes.py", line 78, in weekly_view
+    return render_template('weekly_view.html', trip=trip, weekly_activities=weekly_activities)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/environment.py", line 1304, in render
+    self.environment.handle_exception()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/environment.py", line 939, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/home/runner/workspace/templates/weekly_view.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/home/runner/workspace/templates/base.html", line 35, in top-level template code
+    {% block content %}
+  File "/home/runner/workspace/templates/weekly_view.html", line 11, in block 'content'
+    {% for week, activities in weeks.items() %}
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/environment.py", line 487, in getattr
+    return getattr(obj, attribute)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.UndefinedError: 'weeks' is undefined
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 1498, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 1476, in wsgi_app
+    response = self.handle_exception(e)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/routes.py", line 78, in weekly_view
+    return render_template('weekly_view.html', trip=trip, weekly_activities=weekly_activities)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/environment.py", line 1304, in render
+    self.environment.handle_exception()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/environment.py", line 939, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/home/runner/workspace/templates/weekly_view.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/home/runner/workspace/templates/base.html", line 35, in top-level template code
+    {% block content %}
+  File "/home/runner/workspace/templates/weekly_view.html", line 11, in block 'content'
+    {% for week, activities in weeks.items() %}
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/jinja2/environment.py", line 487, in getattr
+    return getattr(obj, attribute)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.UndefinedError: 'weeks' is undefined
+2024-10-15 06:34:04,727 - INFO - 172.31.196.167 - - [15/Oct/2024 06:34:04] "[36mGET /weekly_view/1?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2024-10-15 06:34:04,767 - INFO - 172.31.196.167 - - [15/Oct/2024 06:34:04] "[36mGET /weekly_view/1?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -

@@ -18,21 +18,17 @@ def init_routes(db, Trip, Activity, Todo):
             trip = Trip.query.get_or_404(trip_id)
             activities = Activity.query.filter_by(trip_id=trip_id).order_by(Activity.date, Activity.start_time).all()
             
-            # Convert activities to a list of dictionaries
-            activities_data = []
-            for activity in activities:
-                activity_dict = {
-                    'id': activity.id,
-                    'title': activity.title,
-                    'date': activity.date.strftime('%Y-%m-%d'),
-                    'start_time': activity.start_time.strftime('%H:%M'),
-                    'end_time': activity.end_time.strftime('%H:%M'),
-                    'location': activity.location,
-                    'category': activity.category,
-                    'latitude': activity.latitude,
-                    'longitude': activity.longitude
-                }
-                activities_data.append(activity_dict)
+            activities_data = [{
+                'id': activity.id,
+                'title': activity.title,
+                'date': activity.date.strftime('%Y-%m-%d'),
+                'start_time': activity.start_time.strftime('%H:%M'),
+                'end_time': activity.end_time.strftime('%H:%M'),
+                'location': activity.location,
+                'category': activity.category,
+                'latitude': activity.latitude,
+                'longitude': activity.longitude
+            } for activity in activities]
             
             return render_template('map_view.html', trip=trip, activities=activities_data)
         except Exception as e:
@@ -62,7 +58,6 @@ def init_routes(db, Trip, Activity, Todo):
 
     @bp.route('/create_vietnam_trip', methods=['POST'])
     def create_vietnam_trip():
-        # Add logic to create a default Vietnam trip
         name = "Vietnam Trip"
         start_date = datetime.now().date()
         end_date = start_date + timedelta(days=14)
@@ -72,4 +67,34 @@ def init_routes(db, Trip, Activity, Todo):
         flash('Vietnam trip created successfully!', 'success')
         return redirect(url_for('routes.index'))
 
-    return bp
+    @bp.route('/weekly_view/<int:trip_id>')
+    def weekly_view(trip_id):
+        trip = Trip.query.get_or_404(trip_id)
+        activities = Activity.query.filter_by(trip_id=trip_id).order_by(Activity.date, Activity.start_time).all()
+        
+        grouped_activities = itertools.groupby(activities, key=lambda x: x.date)
+        weekly_activities = {date: list(activities) for date, activities in grouped_activities}
+        
+        return render_template('weekly_view.html', trip=trip, weekly_activities=weekly_activities)
+
+    @bp.route('/edit_trip/<int:trip_id>', methods=['GET', 'POST'])
+    def edit_trip(trip_id):
+        trip = Trip.query.get_or_404(trip_id)
+        if request.method == 'POST':
+            trip.name = request.form['name']
+            trip.start_date = datetime.strptime(request.form['start_date'], '%Y-%m-%d').date()
+            trip.end_date = datetime.strptime(request.form['end_date'], '%Y-%m-%d').date()
+            db.session.commit()
+            flash('Trip updated successfully!', 'success')
+            return redirect(url_for('routes.index'))
+        return render_template('edit_trip.html', trip=trip)
+
+    @bp.route('/delete_trip/<int:trip_id>', methods=['POST'])
+    def delete_trip(trip_id):
+        trip = Trip.query.get_or_404(trip_id)
+        db.session.delete(trip)
+        db.session.commit()
+        flash('Trip deleted successfully!', 'success')
+        return redirect(url_for('routes.index'))
+
+# Do not return bp from init_routes

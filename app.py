@@ -21,10 +21,11 @@ def create_app():
     with app.app_context():
         from models import init_models
         Trip, Activity, Todo = init_models(db)
-        db.create_all()  # Uncommented this line to ensure all tables are created
+        db.create_all()
 
         # Import and register blueprints/routes
-        from routes import init_routes
-        app.register_blueprint(init_routes(db, Trip, Activity, Todo))
+        from routes import bp, init_routes
+        init_routes(db, Trip, Activity, Todo)
+        app.register_blueprint(bp)
 
     return app

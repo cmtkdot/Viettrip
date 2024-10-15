@@ -37,4 +37,3 @@ else:
 # Close the file handlers
 sys.stdout.close()
 sys.stderr.close()
-app.run(host='0.0.0.0', port=5000
