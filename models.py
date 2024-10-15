@@ -12,6 +12,11 @@ class Activity(db.Model):
     category = db.Column(db.String(50), nullable=False)
     price = db.Column(db.Float, nullable=False, default=0.0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    latitude = db.Column(db.Float, nullable=True)
+    longitude = db.Column(db.Float, nullable=True)
+
+    def __init__(self, **kwargs):
+        super(Activity, self).__init__(**kwargs)
 
     def __repr__(self):
         return f'<Activity {self.title}>'
@@ -26,5 +31,7 @@ class Activity(db.Model):
             'location': self.location,
             'description': self.description,
             'category': self.category,
-            'price': self.price
+            'price': self.price,
+            'latitude': self.latitude,
+            'longitude': self.longitude
         }

@@ -1,0 +1,57 @@
+
+routes
+py
+models
+py
+N
+I'm encountering an issue with adding sample activities. The error suggests that 'latitude' and 'longitude' are invalid keyword arguments for the Activity model. Could you please check the Activity model in models.py and the bulk_add_activities function in routes.py to ensure they are correctly handling these fields? If possible, could you provide the correct implementation for both files?
+
+I've reviewed the provided code for both the models.py and routes.py files. The issue you're encountering is due to a mismatch between the Activity model definition and how you're trying to create new Activity instances in the bulk_add_activities function. Let's correct this:
+
+In models.py, the Activity model already includes latitude and longitude fields, which is correct:
+python
+
+Copy
+class Activity(db.Model):
+    # ... other fields ...
+    latitude = db.Column(db.Float, nullable=True)
+    longitude = db.Column(db.Float, nullable=True)
+This part is fine and doesn't need changes.
+
+In routes.py, the bulk_add_activities function needs a small adjustment. Here's the corrected version:
+python
+
+Copy
+@app.route('/bulk_add_activities', methods=['POST'])
+def bulk_add_activities():
+    activities_data = request.json.get('activities', [])
+    added_activities = []
+    for activity_data in activities_data:
+        date = datetime.strptime(activity_data['date'], '%m/%d/%Y').date()
+        start_time = datetime.strptime(activity_data['start_time'], '%I:%M %p').time()
+        end_time = datetime.strptime(activity_data['end_time'], '%I:%M %p').time()
+        new_activity = Activity(
+            date=date,
+            start_time=start_time,
+            end_time=end_time,
+            title=activity_data['title'],
+            location=activity_data['location'],
+            description=activity_data['description'],
+            category=activity_data['category'],
+            price=float(activity_data['price']),
+            latitude=float(activity_data.get('latitude', 0)),
+            longitude=float(activity_data.get('longitude', 0))
+        )
+        db.session.add(new_activity)
+        added_activities.append(new_activity)
+    db.session.commit()
+    print(f"Added {len(added_activities)} activities to the database")
+    return jsonify({'message': f'Successfully added {len(added_activities)} activities'}), 201
+The key changes are:
+
+Use activity_data.get('latitude', 0) and activity_data.get('longitude', 0) instead of directly accessing these keys. This ensures that if these fields are missing in the input data, it defaults to 0 instead of raising a KeyError.
+Wrap both latitude and longitude in float() to ensure they're converted to the correct type.
+These changes should resolve the "invalid keyword argument" error you're encountering. The Activity model in models.py is correctly defined to accept latitude and longitude, and now the bulk_add_activities function in routes.py is properly handling these fields when creating new Activity instances.
+
+Make sure to restart your Flask application after making these changes. If you continue to encounter issues, double-check that all your activities data includes latitude and longitude values, or that they're properly handled if missing.
+

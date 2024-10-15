@@ -45,6 +45,32 @@
         <label for="price" class="form-label">Price</label>
         <input type="number" step="0.01" class="form-control" id="price" name="price" required>
     </div>
+    <input type="hidden" id="latitude" name="latitude">
+    <input type="hidden" id="longitude" name="longitude">
     <button type="submit" class="btn btn-primary">Add Activity</button>
 </form>
+
+<script>
+    function initAutocomplete() {
+        var input = document.getElementById('location');
+        var autocomplete = new google.maps.places.Autocomplete(input);
+        
+        autocomplete.addListener('place_changed', function() {
+            var place = autocomplete.getPlace();
+            if (!place.geometry) {
+                console.log("No details available for input: '" + place.name + "'");
+                return;
+            }
+            
+            document.getElementById('latitude').value = place.geometry.location.lat();
+            document.getElementById('longitude').value = place.geometry.location.lng();
+        });
+    }
+
+    // Update the initGoogleMaps function to initialize autocomplete
+    function initGoogleMaps() {
+        console.log("Google Maps API loaded successfully");
+        initAutocomplete();
+    }
+</script>
 {% endblock %}

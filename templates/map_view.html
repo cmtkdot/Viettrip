@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">Map View</h1>
+
+<div id="map" style="height: 600px;"></div>
+
+<script>
+    function initMap() {
+        var map = new google.maps.Map(document.getElementById('map'), {
+            center: {lat: 16.0, lng: 106.0},
+            zoom: 6
+        });
+
+        var activities = {{ activities|tojson|safe }};
+        console.log("Activities data:", activities);
+
+        var markers = [];
+        var bounds = new google.maps.LatLngBounds();
+        var infoWindow = new google.maps.InfoWindow();
+
+        activities.forEach(function(activity) {
+            console.log("Processing activity:", activity);
+            if (activity.latitude && activity.longitude) {
+                console.log("Adding marker for:", activity.title);
+                var position = new google.maps.LatLng(activity.latitude, activity.longitude);
+                var marker = new google.maps.Marker({
+                    position: position,
+                    map: map,
+                    title: activity.title
+                });
+
+                bounds.extend(position);
+                markers.push(marker);
+
+                google.maps.event.addListener(marker, 'click', (function(marker) {
+                    return function() {
+                        var content = "<b>" + activity.title + "</b><br>" +
+                                      "Date: " + activity.date + "<br>" +
+                                      "Time: " + activity.start_time + " - " + activity.end_time + "<br>" +
+                                      "Location: " + activity.location + "<br>" +
+                                      "Category: " + activity.category + "<br>" +
+                                      "Price: $" + activity.price.toFixed(2);
+                        infoWindow.setContent(content);
+                        infoWindow.open(map, marker);
+                    }
+                })(marker));
+            } else {
+                console.log("Missing coordinates for:", activity.title);
+            }
+        });
+
+        // Create a polyline to connect the markers
+        var path = markers.map(function(marker) { return marker.getPosition(); });
+        var polyline = new google.maps.Polyline({
+            path: path,
+            geodesic: true,
+            strokeColor: '#FF0000',
+            strokeOpacity: 1.0,
+            strokeWeight: 2
+        });
+        polyline.setMap(map);
+
+        // Fit the map to show all markers
+        if (markers.length > 0) {
+            map.fitBounds(bounds);
+        } else {
+            console.log("No markers to fit");
+        }
+    }
+
+    // Update the initGoogleMaps function to initialize the map
+    function initGoogleMaps() {
+        if (typeof google === 'undefined') {
+            setTimeout(initGoogleMaps, 100);
+            return;
+        }
+        console.log("Google Maps API loaded successfully");
+        initMap();
+    }
+</script>
+{% endblock %}

@@ -1,6 +1,6 @@
-from flask import render_template, request, jsonify, redirect, url_for
 from app import app, db
 from models import Activity
+from flask import render_template, request, jsonify, redirect, url_for
 from datetime import datetime, timedelta
 from sqlalchemy import func
 import itertools
@@ -28,7 +28,9 @@ def add_activity():
             location=request.form['location'],
             description=request.form['description'],
             category=request.form['category'],
-            price=float(request.form['price'])
+            price=float(request.form['price']),
+            latitude=float(request.form['latitude']) if request.form.get('latitude') else None,
+            longitude=float(request.form['longitude']) if request.form.get('longitude') else None
         )
         db.session.add(new_activity)
         db.session.commit()
@@ -74,7 +76,7 @@ def weekly_view_data():
         Activity.date <= end_of_week
     )
     
-    if categories and categories[0]:  # Check if categories list is not empty
+    if categories and categories[0]:
         activities_query = activities_query.filter(Activity.category.in_(categories))
     
     activities = activities_query.order_by(Activity.date, Activity.start_time).all()
@@ -92,6 +94,7 @@ def weekly_view_data():
 @app.route('/bulk_add_activities', methods=['POST'])
 def bulk_add_activities():
     activities_data = request.json.get('activities', [])
+    added_activities = []
     for activity_data in activities_data:
         date = datetime.strptime(activity_data['date'], '%m/%d/%Y').date()
         start_time = datetime.strptime(activity_data['start_time'], '%I:%M %p').time()
@@ -104,13 +107,32 @@ def bulk_add_activities():
             location=activity_data['location'],
             description=activity_data['description'],
             category=activity_data['category'],
-            price=float(activity_data['price'])
+            price=float(activity_data['price']),
+            latitude=float(activity_data.get('latitude')) if activity_data.get('latitude') is not None else None,
+            longitude=float(activity_data.get('longitude')) if activity_data.get('longitude') is not None else None
         )
         db.session.add(new_activity)
+        added_activities.append(new_activity)
     db.session.commit()
-    return jsonify({'message': 'Activities added successfully'}), 201
+    print(f"Added {len(added_activities)} activities to the database")
+    return jsonify({'message': f'Successfully added {len(added_activities)} activities'}), 201
 
 @app.route('/activities/<int:activity_id>')
 def get_activity(activity_id):
     activity = Activity.query.get_or_404(activity_id)
     return jsonify(activity.to_dict())
+
+@app.route('/map_view')
+def map_view():
+    activities = Activity.query.all()
+    activity_data = []
+    print(f"Total activities in database: {len(activities)}")
+    for activity in activities:
+        activity_dict = activity.to_dict()
+        print(f"Activity: {activity.title}, Lat: {activity_dict['latitude']}, Lon: {activity_dict['longitude']}")
+        if activity_dict['latitude'] is not None and activity_dict['longitude'] is not None:
+            activity_data.append(activity_dict)
+        else:
+            print(f"Warning: Activity '{activity.title}' has missing coordinates")
+    print(f"Activities with valid coordinates: {len(activity_data)}")
+    return render_template('map_view.html', activities=activity_data)
