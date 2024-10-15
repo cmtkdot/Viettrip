@@ -1,31 +1,59 @@
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from models import db, Trip
 import os
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase
+from dotenv import load_dotenv
+from werkzeug.urls import quote as url_quote
 
-class Base(DeclarativeBase):
-    pass
+load_dotenv()
 
-db = SQLAlchemy(model_class=Base)
+app = Flask(__name__)
+CORS(app)
 
-def create_app():
-    app = Flask(__name__)
-    app.secret_key = os.environ.get("FLASK_SECRET_KEY") or "a secret key"
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///app.db")
-    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-        "pool_recycle": 300,
-        "pool_pre_ping": True,
-    }
-    db.init_app(app)
+# Database configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
 
+db.init_app(app)
+
+@app.route('/api/trips', methods=['GET', 'POST'])
+def trips():
+    if request.method == 'GET':
+        all_trips = Trip.query.all()
+        return jsonify([trip.to_dict() for trip in all_trips])
+    elif request.method == 'POST':
+        data = request.json
+        new_trip = Trip(
+            destination=data['destination'],
+            start_date=data['startDate'],
+            end_date=data['endDate'],
+            activities=data.get('activities', [])
+        )
+        db.session.add(new_trip)
+        db.session.commit()
+        return jsonify(new_trip.to_dict()), 201
+
+@app.route('/api/trips/<int:trip_id>', methods=['GET', 'PUT', 'DELETE'])
+def trip(trip_id):
+    trip = Trip.query.get_or_404(trip_id)
+    
+    if request.method == 'GET':
+        return jsonify(trip.to_dict())
+    elif request.method == 'PUT':
+        data = request.json
+        trip.destination = data.get('destination', trip.destination)
+        trip.start_date = data.get('startDate', trip.start_date)
+        trip.end_date = data.get('endDate', trip.end_date)
+        trip.activities = data.get('activities', trip.activities)
+        db.session.commit()
+        return jsonify(trip.to_dict())
+    elif request.method == 'DELETE':
+        db.session.delete(trip)
+        db.session.commit()
+        return '', 204
+
+if __name__ == '__main__':
     with app.app_context():
-        from models import init_models
-        Trip, Activity, Todo = init_models(db)
         db.create_all()
-
-        # Import and register blueprints/routes
-        from routes import bp, init_routes
-        init_routes(db, Trip, Activity, Todo)
-        app.register_blueprint(bp)
-
-    return app
+    app.run(debug=True, port=5000)

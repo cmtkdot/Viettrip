@@ -4,6 +4,7 @@ import TripPlanner from './components/TripPlanner';
 import TodoList from './components/TodoList';
 import WeatherForecast from './components/WeatherForecast';
 import CurrencyConverter from './components/CurrencyConverter';
+import StickyChatbot from './components/StickyChatbot';
 import './App.css';
 
 function App() {
@@ -12,6 +13,15 @@ function App() {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleAddTrip = (trip) => {
+    const newTripWithId = { ...trip, id: Date.now() };
+    setTrips([...trips, newTripWithId]);
+  };
+
+  const handleUpdateTrip = (updatedTrip) => {
+    setTrips(trips.map(trip => trip.id === updatedTrip.id ? updatedTrip : trip));
   };
 
   return (
@@ -42,6 +52,11 @@ function App() {
         <footer>
           <p>&copy; 2023 Trip Itinerary Guide. All rights reserved.</p>
         </footer>
+        <StickyChatbot
+          trips={trips}
+          onAddTrip={handleAddTrip}
+          onUpdateTrip={handleUpdateTrip}
+        />
       </div>
     </Router>
   );
