@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">Import Activities for {{ trip.name }}</h1>
+
+<form method="POST" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="file">Select CSV file</label>
+        <input type="file" class="form-control-file" id="file" name="file" accept=".csv" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Import Activities</button>
+    <a href="{{ url_for('routes.trip_detail', trip_id=trip.id) }}" class="btn btn-secondary">Cancel</a>
+</form>
+
+<div class="mt-4">
+    <h2>CSV Format</h2>
+    <p>Your CSV file should have the following columns in this order:</p>
+    <ol>
+        <li>Title</li>
+        <li>Date (YYYY-MM-DD)</li>
+        <li>Start Time (HH:MM)</li>
+        <li>End Time (HH:MM)</li>
+        <li>Location</li>
+        <li>Category</li>
+    </ol>
+    <p>The first row should be a header row with these column names.</p>
+    <p>Note: Latitude and Longitude will be automatically populated based on the Location using Google Maps API.</p>
+    <h3>Important:</h3>
+    <ul>
+        <li>Ensure all dates are within the trip's date range.</li>
+        <li>Provide specific locations for accurate geocoding.</li>
+        <li>If errors occur during import, you'll receive a downloadable error log.</li>
+    </ul>
+</div>
+
+{% endblock %}

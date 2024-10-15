@@ -8,8 +8,33 @@
     <a href="{{ url_for('routes.weekly_view', trip_id=trip.id) }}" class="btn btn-secondary">Weekly View</a>
     <a href="{{ url_for('routes.map_view', trip_id=trip.id) }}" class="btn btn-info">Map View</a>
     <a href="{{ url_for('routes.edit_trip', trip_id=trip.id) }}" class="btn btn-warning">Edit Trip</a>
+    <a href="{{ url_for('routes.add_activity', trip_id=trip.id) }}" class="btn btn-success">Add Activity</a>
+    <a href="{{ url_for('routes.import_activities', trip_id=trip.id) }}" class="btn btn-primary">Import Activities</a>
 </div>
 
-<!-- ... (keep the rest of the existing content) ... -->
+<h2>Activities</h2>
+<ul class="list-group">
+{% for activity in activities %}
+    <li class="list-group-item">
+        <h3>{{ activity.title }}</h3>
+        <p>Date: {{ activity.date.strftime('%Y-%m-%d') }}</p>
+        <p>Time: {{ activity.start_time.strftime('%H:%M') }} - {{ activity.end_time.strftime('%H:%M') }}</p>
+        <p>Location: {{ activity.location }}</p>
+        <a href="{{ url_for('routes.edit_activity', activity_id=activity.id) }}" class="btn btn-sm btn-warning">Edit</a>
+        <form action="{{ url_for('routes.delete_activity', activity_id=activity.id) }}" method="POST" style="display: inline;">
+            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this activity?');">Delete</button>
+        </form>
+    </li>
+{% endfor %}
+</ul>
+
+<h2>To-Do List</h2>
+<ul class="list-group">
+{% for todo in todos %}
+    <li class="list-group-item">
+        {{ todo.description }}
+    </li>
+{% endfor %}
+</ul>
 
 {% endblock %}

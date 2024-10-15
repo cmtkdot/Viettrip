@@ -5,11 +5,6 @@
 
 <div class="mb-4">
     <a href="{{ url_for('routes.add_trip') }}" class="btn btn-primary">Add New Trip</a>
-    {% if not vietnam_trip_exists %}
-    <form action="{{ url_for('routes.create_vietnam_trip') }}" method="post" class="d-inline">
-        <button type="submit" class="btn btn-success">Create Vietnam Trip</button>
-    </form>
-    {% endif %}
 </div>
 
 <div id="trips">

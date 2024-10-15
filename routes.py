@@ -3,6 +3,10 @@ from datetime import datetime, timedelta
 from sqlalchemy import func
 import itertools
 import logging
+import csv
+import io
+import requests
+import os
 
 bp = Blueprint('routes', __name__)
 
@@ -96,5 +100,106 @@ def init_routes(db, Trip, Activity, Todo):
         db.session.commit()
         flash('Trip deleted successfully!', 'success')
         return redirect(url_for('routes.index'))
+
+    @bp.route('/add_activity/<int:trip_id>', methods=['GET', 'POST'])
+    def add_activity(trip_id):
+        trip = Trip.query.get_or_404(trip_id)
+        categories = ['Sightseeing', 'Food', 'Transportation', 'Accommodation', 'Entertainment', 'Shopping', 'Other']
+        
+        if request.method == 'POST':
+            title = request.form['title']
+            date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
+            start_time = datetime.strptime(request.form['start_time'], '%H:%M').time()
+            end_time = datetime.strptime(request.form['end_time'], '%H:%M').time()
+            location = request.form['location']
+            category = request.form['category']
+            latitude = float(request.form['latitude'])
+            longitude = float(request.form['longitude'])
+
+            new_activity = Activity(
+                trip_id=trip_id,
+                title=title,
+                date=date,
+                start_time=start_time,
+                end_time=end_time,
+                location=location,
+                category=category,
+                latitude=latitude,
+                longitude=longitude
+            )
+            db.session.add(new_activity)
+            db.session.commit()
+            flash('New activity added successfully!', 'success')
+            return redirect(url_for('routes.trip_detail', trip_id=trip_id))
+        
+        return render_template('add_activity.html', trip=trip, categories=categories)
+
+    @bp.route('/edit_activity/<int:activity_id>', methods=['GET', 'POST'])
+    def edit_activity(activity_id):
+        activity = Activity.query.get_or_404(activity_id)
+        if request.method == 'POST':
+            activity.title = request.form['title']
+            activity.date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
+            activity.start_time = datetime.strptime(request.form['start_time'], '%H:%M').time()
+            activity.end_time = datetime.strptime(request.form['end_time'], '%H:%M').time()
+            activity.location = request.form['location']
+            activity.category = request.form['category']
+            activity.latitude = float(request.form['latitude'])
+            activity.longitude = float(request.form['longitude'])
+            db.session.commit()
+            flash('Activity updated successfully!', 'success')
+            return redirect(url_for('routes.trip_detail', trip_id=activity.trip_id))
+        return render_template('edit_activity.html', activity=activity)
+
+    @bp.route('/delete_activity/<int:activity_id>', methods=['POST'])
+    def delete_activity(activity_id):
+        activity = Activity.query.get_or_404(activity_id)
+        trip_id = activity.trip_id
+        db.session.delete(activity)
+        db.session.commit()
+        flash('Activity deleted successfully!', 'success')
+        return redirect(url_for('routes.trip_detail', trip_id=trip_id))
+
+    @bp.route('/import_activities/<int:trip_id>', methods=['GET', 'POST'])
+    def import_activities(trip_id):
+        trip = Trip.query.get_or_404(trip_id)
+        if request.method == 'POST':
+            if 'file' not in request.files:
+                flash('No file part', 'error')
+                return redirect(request.url)
+            file = request.files['file']
+            if file.filename == '':
+                flash('No selected file', 'error')
+                return redirect(request.url)
+            if file and file.filename.endswith('.csv'):
+                try:
+                    stream = io.StringIO(file.stream.read().decode("UTF8"), newline=None)
+                    csv_input = csv.reader(stream)
+                    next(csv_input)  # Skip header row
+                    for row in csv_input:
+                        title, date, start_time, end_time, location, category, latitude, longitude = row
+                        new_activity = Activity(
+                            trip_id=trip_id,
+                            title=title,
+                            date=datetime.strptime(date, '%Y-%m-%d').date(),
+                            start_time=datetime.strptime(start_time, '%H:%M').time(),
+                            end_time=datetime.strptime(end_time, '%H:%M').time(),
+                            location=location,
+                            category=category,
+                            latitude=float(latitude),
+                            longitude=float(longitude)
+                        )
+                        db.session.add(new_activity)
+                    db.session.commit()
+                    flash('Activities imported successfully!', 'success')
+                    return redirect(url_for('routes.trip_detail', trip_id=trip_id))
+                except Exception as e:
+                    db.session.rollback()
+                    flash(f'Error importing activities: {str(e)}', 'error')
+                    return redirect(request.url)
+            else:
+                flash('Please upload a CSV file', 'error')
+                return redirect(request.url)
+        return render_template('import_activities.html', trip=trip)
 
 # Do not return bp from init_routes

@@ -1,5 +1,5 @@
 run = "python main.py"
-modules = ["python-3.11"]
+modules = ["nodejs-20", "python-3.11"]
 
 [env]
 FLASK_APP = "main.py"

@@ -1,31 +1,32 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 class="mb-4">{{ trip.name }} - Weekly View</h1>
+<h1 class="mb-4">Weekly View: {{ trip.name }}</h1>
 
-<div class="mb-3">
-    <a href="{{ url_for('routes.trip_detail', trip_id=trip.id) }}" class="btn btn-primary">Back to Trip Detail</a>
-</div>
+<a href="{{ url_for('routes.trip_detail', trip_id=trip.id) }}" class="btn btn-primary mb-3">Back to Trip Details</a>
 
-<div class="calendar-container">
-    {% for week, activities in weeks.items() %}
-        <h2 class="week-header">{{ week }}</h2>
-        <div class="calendar-week">
-            {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
-                <div class="calendar-day">
-                    <h3 class="day-header">{{ day }}</h3>
-                    <div class="day-activities">
-                        {% for activity in activities if activity.date.strftime('%A') == day %}
-                            <div class="activity-item">
-                                <strong>{{ activity.title }}</strong>
-                                <br>
-                                {{ activity.start_time.strftime('%H:%M') }} - {{ activity.end_time.strftime('%H:%M') }}
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% endfor %}
-</div>
+{% for week in weeks %}
+    <h2 class="mt-4">Week {{ loop.index }}</h2>
+    <div class="row">
+        {% for date in week %}
+            <div class="col">
+                <h3>{{ date.strftime('%A') }}<br>{{ date.strftime('%B %d') }}</h3>
+                {% if date in activities_by_date %}
+                    <ul class="list-group">
+                    {% for activity in activities_by_date[date] %}
+                        <li class="list-group-item">
+                            <strong>{{ activity.title }}</strong><br>
+                            {{ activity.start_time.strftime('%H:%M') }} - {{ activity.end_time.strftime('%H:%M') }}<br>
+                            {{ activity.location }}
+                        </li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No activities</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+{% endfor %}
+
 {% endblock %}

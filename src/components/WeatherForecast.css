@@ -1,0 +1,57 @@
+.weather-forecast {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.weather-forecast form {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.weather-forecast input[type="text"] {
+  flex-grow: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px 0 0 4px;
+}
+
+.weather-forecast button[type="submit"] {
+  padding: 8px 15px;
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+}
+
+.forecast-results {
+  background-color: #f8f8f8;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 15px;
+}
+
+.forecast-results ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.forecast-results li {
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+.forecast-results li:last-child {
+  border-bottom: none;
+}
+
+.error {
+  color: #f44336;
+}
+
+@media (max-width: 768px) {
+  .weather-forecast {
+    padding: 0 15px;
+  }
+}
