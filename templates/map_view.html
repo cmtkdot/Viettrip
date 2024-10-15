@@ -3,17 +3,39 @@
 {% block content %}
 <h1 class="mb-4">Map View</h1>
 
+<div class="row mb-3">
+  <div class="col-md-6">
+    <div id="category-legend" class="mb-3">
+      <h5>Categories:</h5>
+      <div id="legend-items"></div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div id="category-filter" class="mb-3">
+      <h5>Filter by Category:</h5>
+      <div id="filter-checkboxes"></div>
+    </div>
+  </div>
+</div>
+
+<div class="row mb-3">
+  <div class="col-md-12">
+    <button id="toggle-route" class="btn btn-primary">Toggle Route</button>
+  </div>
+</div>
+
 <div class="map-and-list-container">
   <div id="map" style="height: 600px; width: 70%;"></div>
   <div id="activity-list" style="width: 30%; overflow-y: auto; height: 600px;">
     <h2>Activities</h2>
     <ul class="list-group">
     {% for activity in activities %}
-      <li class="list-group-item">
+      <li class="list-group-item" data-category="{{ activity.category }}">
         <h5>{{ activity.title }}</h5>
         <p>Date: {{ activity.date }}</p>
         <p>Time: {{ activity.start_time }} - {{ activity.end_time }}</p>
         <p>Location: {{ activity.location }}</p>
+        <p>Category: {{ activity.category }}</p>
       </li>
     {% endfor %}
     </ul>
@@ -21,51 +43,115 @@
 </div>
 
 <script>
+    let map;
+    let markers = [];
+    let polyline;
+    let activities = {{ activities|tojson|safe }};
+    const categoryColors = {
+        'Travel': '#FF0000',
+        'Accommodation': '#00FF00',
+        'Sightseeing': '#0000FF',
+        'Cultural': '#FFFF00',
+        'Food': '#FF00FF',
+        'Entertainment': '#00FFFF',
+        'Historical': '#FFA500'
+    };
+
     function initMap() {
-        var map = new google.maps.Map(document.getElementById('map'), {
+        map = new google.maps.Map(document.getElementById('map'), {
             center: {lat: 16.0, lng: 106.0},
             zoom: 6
         });
 
-        var activities = {{ activities|tojson|safe }};
-        console.log("Activities data:", activities);
-
-        var markers = [];
-        var bounds = new google.maps.LatLngBounds();
-        var infoWindow = new google.maps.InfoWindow();
+        let bounds = new google.maps.LatLngBounds();
+        let infoWindow = new google.maps.InfoWindow();
 
         activities.forEach(function(activity) {
-            console.log("Processing activity:", activity);
             if (activity.latitude && activity.longitude) {
-                console.log("Adding marker for:", activity.title);
-                var position = new google.maps.LatLng(activity.latitude, activity.longitude);
-                var markerView = new google.maps.marker.AdvancedMarkerView({
+                let position = new google.maps.LatLng(activity.latitude, activity.longitude);
+                let marker = new google.maps.Marker({
                     position: position,
                     map: map,
-                    title: activity.title
+                    title: activity.title,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        fillColor: categoryColors[activity.category],
+                        fillOpacity: 1,
+                        strokeWeight: 0,
+                        scale: 8
+                    }
                 });
 
                 bounds.extend(position);
-                markers.push(markerView);
+                markers.push(marker);
 
-                markerView.addListener('click', function() {
-                    var content = "<b>" + activity.title + "</b><br>" +
-                                  "Date: " + activity.date + "<br>" +
-                                  "Time: " + activity.start_time + " - " + activity.end_time + "<br>" +
-                                  "Location: " + activity.location + "<br>" +
-                                  "Category: " + activity.category + "<br>" +
-                                  "Price: $" + activity.price.toFixed(2);
+                marker.addListener('click', function() {
+                    let content = `<b>${activity.title}</b><br>
+                                   Date: ${activity.date}<br>
+                                   Time: ${activity.start_time} - ${activity.end_time}<br>
+                                   Location: ${activity.location}<br>
+                                   Category: ${activity.category}<br>
+                                   Price: $${parseFloat(activity.price).toFixed(2)}`;
                     infoWindow.setContent(content);
-                    infoWindow.open(map, markerView);
+                    infoWindow.open(map, marker);
                 });
-            } else {
-                console.log("Missing coordinates for:", activity.title);
             }
         });
 
-        // Create a polyline to connect the markers
-        var path = markers.map(function(marker) { return marker.position; });
-        var polyline = new google.maps.Polyline({
+        if (markers.length > 0) {
+            map.fitBounds(bounds);
+        }
+
+        createLegend();
+        createCategoryFilter();
+        drawRoute();
+    }
+
+    function createLegend() {
+        const legendDiv = document.getElementById('legend-items');
+        Object.entries(categoryColors).forEach(([category, color]) => {
+            const item = document.createElement('div');
+            item.innerHTML = `<span style="background-color:${color}; width: 20px; height: 20px; display: inline-block; margin-right: 5px;"></span>${category}`;
+            legendDiv.appendChild(item);
+        });
+    }
+
+    function createCategoryFilter() {
+        const filterDiv = document.getElementById('filter-checkboxes');
+        Object.keys(categoryColors).forEach(category => {
+            const checkbox = document.createElement('div');
+            checkbox.className = 'form-check';
+            checkbox.innerHTML = `
+                <input class="form-check-input" type="checkbox" value="${category}" id="filter-${category}" checked>
+                <label class="form-check-label" for="filter-${category}">${category}</label>
+            `;
+            filterDiv.appendChild(checkbox);
+            checkbox.querySelector('input').addEventListener('change', filterMarkers);
+        });
+    }
+
+    function filterMarkers() {
+        const checkedCategories = Array.from(document.querySelectorAll('#filter-checkboxes input:checked')).map(cb => cb.value);
+        markers.forEach((marker, i) => {
+            const category = activities[i].category;
+            marker.setVisible(checkedCategories.includes(category));
+        });
+        document.querySelectorAll('#activity-list li').forEach(li => {
+            li.style.display = checkedCategories.includes(li.dataset.category) ? '' : 'none';
+        });
+        if (polyline) {
+            drawRoute();
+        }
+    }
+
+    function drawRoute() {
+        if (polyline) {
+            polyline.setMap(null);
+        }
+        const checkedCategories = Array.from(document.querySelectorAll('#filter-checkboxes input:checked')).map(cb => cb.value);
+        const filteredMarkers = markers.filter((marker, i) => checkedCategories.includes(activities[i].category));
+        const path = filteredMarkers.map(marker => marker.getPosition());
+        polyline = new google.maps.Polyline({
             path: path,
             geodesic: true,
             strokeColor: '#FF0000',
@@ -73,14 +159,13 @@
             strokeWeight: 2
         });
         polyline.setMap(map);
-
-        // Fit the map to show all markers
-        if (markers.length > 0) {
-            map.fitBounds(bounds);
-        } else {
-            console.log("No markers to fit");
-        }
     }
+
+    document.getElementById('toggle-route').addEventListener('click', function() {
+        if (polyline) {
+            polyline.setVisible(!polyline.getVisible());
+        }
+    });
 
     // Update the initGoogleMaps function to initialize the map
     function initGoogleMaps() {

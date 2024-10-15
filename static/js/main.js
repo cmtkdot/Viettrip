@@ -31,6 +31,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     updateWeeklyCalendar(data);
+                    highlightVietnamActivities();
+                    updateTotalCost(data);
+                    updateCategorySummary(data);
                 })
                 .catch(error => console.error('Error fetching weekly view data:', error));
         }
@@ -198,6 +201,106 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+
+    // New function to highlight Vietnam activities
+    function highlightVietnamActivities() {
+        const activityItems = document.querySelectorAll('.activity-item');
+        activityItems.forEach(item => {
+            if (item.querySelector('.activity-details p:nth-child(1)').textContent.includes('Vietnam')) {
+                item.classList.add('vietnam-activity');
+            }
+        });
+    }
+
+    // New function to calculate and display total cost
+    function updateTotalCost(data) {
+        let totalCost = 0;
+        Object.values(data).forEach(activities => {
+            activities.forEach(activity => {
+                totalCost += parseFloat(activity.price);
+            });
+        });
+
+        const totalCostElement = document.getElementById('totalCost');
+        if (totalCostElement) {
+            totalCostElement.textContent = `Total Cost: $${totalCost.toFixed(2)}`;
+        } else {
+            const costDiv = document.createElement('div');
+            costDiv.id = 'totalCost';
+            costDiv.className = 'alert alert-info mt-3';
+            costDiv.textContent = `Total Cost: $${totalCost.toFixed(2)}`;
+            document.querySelector('.weekly-view-container').appendChild(costDiv);
+        }
+    }
+
+    // New function to show summary of activities by category
+    function updateCategorySummary(data) {
+        const categorySummary = {};
+        Object.values(data).forEach(activities => {
+            activities.forEach(activity => {
+                if (categorySummary[activity.category]) {
+                    categorySummary[activity.category]++;
+                } else {
+                    categorySummary[activity.category] = 1;
+                }
+            });
+        });
+
+        const summaryElement = document.getElementById('categorySummary');
+        if (summaryElement) {
+            summaryElement.innerHTML = '';
+        } else {
+            const summaryDiv = document.createElement('div');
+            summaryDiv.id = 'categorySummary';
+            summaryDiv.className = 'mt-3';
+            document.querySelector('.weekly-view-container').appendChild(summaryDiv);
+        }
+
+        const summaryHtml = Object.entries(categorySummary).map(([category, count]) => 
+            `<span class="badge bg-secondary me-2">${category}: ${count}</span>`
+        ).join('');
+
+        document.getElementById('categorySummary').innerHTML = `
+            <h5>Activity Summary</h5>
+            ${summaryHtml}
+        `;
+    }
+
+    // New function to export current view as printable format
+    function exportPrintableView() {
+        const printWindow = window.open('', '_blank');
+        const weeklyViewContainer = document.querySelector('.weekly-view-container');
+        const totalCost = document.getElementById('totalCost');
+        const categorySummary = document.getElementById('categorySummary');
+
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Weekly View - Printable</title>
+                <style>
+                    body { font-family: Arial, sans-serif; }
+                    .activity-item { border: 1px solid #ccc; margin-bottom: 10px; padding: 5px; }
+                </style>
+            </head>
+            <body>
+                <h1>Weekly View</h1>
+                ${weeklyViewContainer.innerHTML}
+                ${totalCost ? totalCost.outerHTML : ''}
+                ${categorySummary ? categorySummary.outerHTML : ''}
+            </body>
+            </html>
+        `);
+
+        printWindow.document.close();
+        printWindow.print();
+    }
+
+    // Add export button
+    const exportButton = document.createElement('button');
+    exportButton.textContent = 'Export Printable View';
+    exportButton.className = 'btn btn-secondary mt-3';
+    exportButton.addEventListener('click', exportPrintableView);
+    document.querySelector('.weekly-view-container').appendChild(exportButton);
 
     // Initial attachment of activity item listeners and toggle day view listeners
     attachActivityItemListeners();
